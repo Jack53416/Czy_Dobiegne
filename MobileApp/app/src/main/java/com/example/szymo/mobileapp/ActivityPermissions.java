@@ -19,7 +19,7 @@ import android.widget.Button;
  * Created by Szymon on 2017-08-22.
  */
 
-public class ActivityPermissions extends Activity {
+public class ActivityPermissions extends ActivityBase {
     Context mContext;
     Button permission;
     Activity thisActivity;
@@ -27,9 +27,6 @@ public class ActivityPermissions extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_permission);
         mContext = this;
@@ -59,6 +56,7 @@ public class ActivityPermissions extends Activity {
 
                     Intent intent = new Intent(this, ActivityMain.class);
                     startActivity(intent);
+                    finish();
                 } else {
 
                 }
@@ -68,5 +66,8 @@ public class ActivityPermissions extends Activity {
             // other 'case' lines to check for other
             // permissions this app might request
         }
+    }
+    @Override
+    public void onBackPressed() {
     }
 }
