@@ -22,3 +22,8 @@ user '<user>' password '<Pass>';
 cat <<EOF > ./fdb-config.json
 {"host":'localhost',"port":3050,"database":'Toilets.fdb',"user":<user>,"password":<pass>,"lowercase_keys":false,"role":null,"pageSize":8192}
 EOF
+
+sudo ufw allow 3050/tcp
+#edit /usr/lib/firebird/2.5/firebird.conf
+#Replace RemoteBindAddress = localhost
+#With RemoteBindAddress = 
