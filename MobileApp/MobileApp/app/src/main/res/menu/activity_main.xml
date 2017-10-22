@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 <item
     android:id="@+id/menu_add_localization"
-    android:src="@drawable/ic_location"
-    android:showAsAction="always"
-    android:visible="true"
+    android:icon="@drawable/ic_location"
+    app:showAsAction="always"
     android:title="add localization"/>
 </menu>
