@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Czy dobiegnę ?</string>
+    <string name="permissions_button">Uprawnienia</string>
+    <string name="permission">Musisz zakceptować uprawnienia\n jeśli chesz korzystać z aplikacji</string>
+    <string name="back_pres">Aby wyjść z aplikacji, kliknij przycisk WSTECZ dwukrotnie</string>
+
+
+    <bool name="canUseLandscapeMode">false</bool>
+</resources>
