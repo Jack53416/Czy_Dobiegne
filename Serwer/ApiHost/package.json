@@ -1,0 +1,17 @@
+{
+  "name": "ApiHost",
+  "version": "0.0.0",
+  "description": "Api provider for toilets",
+  "main": "server.js",
+  "author": {
+    "name": "Jacek"
+  },
+  "dependencies": {
+    "async": "^2.5.0",
+    "body-parser": "^1.18.2",
+    "ejs": "^2.5.7",
+    "express": "^4.15.4",
+    "helmet": "^3.8.1",
+    "node-firebird": "^0.8.2"
+  }
+}
