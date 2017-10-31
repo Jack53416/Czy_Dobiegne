@@ -15,7 +15,8 @@ dpkg-reconfigure firebird2.5-superclassic
 isql-fb
 
 CREATE DATABASE '/home/ubuntu/Toilets.fdb' page_size 8192
-user '<user>' password '<Pass>';
+user '<user>' password '<Pass>'
+DEFAULT CHARACTER SET UTF8 COLLATION UNICODE;
 
 #isql.exe -q -i script.sql
 

@@ -12,6 +12,9 @@
     "ejs": "^2.5.7",
     "express": "^4.15.4",
     "helmet": "^3.8.1",
+    "jsonwebtoken": "^8.1.0",
+    "method-override": "^2.3.10",
+    "morgan": "^1.9.0",
     "node-firebird": "^0.8.2"
   }
 }
