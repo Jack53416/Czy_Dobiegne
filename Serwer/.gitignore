@@ -19,3 +19,6 @@ ExportedObj/
 #Node dependecies
 /ApiHost/node_modules
 fb-config.json
+
+#Atom files
+.tern-project
