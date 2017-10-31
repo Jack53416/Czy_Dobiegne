@@ -1,5 +1,7 @@
 "use strict"
 var fs = require("fs");
+var crypto = require('crypto');
+
 
 var readJSONFile = function (fileName) {
     if (!fs.existsSync(fileName)) {
@@ -12,4 +14,16 @@ var readJSONFile = function (fileName) {
     return object;
 }
 
+
+var hashData = function (algorithm, input, encoding){
+  var hash = crypto.createHash(algorithm);
+  return hash.update(new Buffer(input)).digest(encoding);
+}
+
+var generateSalt = function(){
+  return crypto.randomBytes(16).toString('base64');
+}
+
 exports.readJSONFile = readJSONFile;
+exports.hashData = hashData;
+exports.generateSalt = generateSalt;

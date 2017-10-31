@@ -32,10 +32,22 @@ router.post('/auth', function(req, res, next){
 
 });
 
+
+router.post('/cry', function(req,res, next){
+  var salt = helpers.generateSalt();
+  res.json({"result": helpers.hashData('sha256',req.body.message + salt,'base64'),
+            "salt": salt});
+});
+
 router.use(ErrorHandlerGeneric);
 
+
 function checkCredentials(userData, requestPassword){
-  if(userData.PASSWORD == requestPassword ){
+  var encryptedFromRequest = helpers.hashData('sha256',
+                             requestPassword + userData.SALT,
+                             'base64');
+
+  if(userData.PASSWORD === encryptedFromRequest ){
     return true;
   }
   return false;
