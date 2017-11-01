@@ -1,16 +1,12 @@
 package com.example.szymo.mobileapp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Window;
-import android.view.WindowManager;
 
 import static java.lang.Thread.sleep;
 
@@ -28,19 +24,35 @@ public class ActivitySplash extends ActivityBase {
 
         setContentView(R.layout.activity_splash);
 
+        new WaitingThread().start();
+    }
+
+    private class WaitingThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                sleep(SLEEP_TIME);
+            } catch (final InterruptedException ignored) {
+            }
+
+            // TODO needs to handle homescreen key etc
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    startMainApp();
+                }
+            });
+        }
+    }
+
+    private void startMainApp() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
-        try
-        {
-            sleep(SLEEP_TIME);
-        }
-        catch (final InterruptedException ignored)
-        {
-        }
+
         switch (requestCode) {
             case 1: {
 
@@ -60,13 +72,14 @@ public class ActivitySplash extends ActivityBase {
 
         }
     }
+
     @Override
     public void onBackPressed() {
         moveTaskToBack(true);
     }
+
     @Override
-    public  void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
     }
 

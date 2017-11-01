@@ -3,7 +3,8 @@
     <string name="permissions_button">Uprawnienia</string>
     <string name="permission">Musisz zakceptować uprawnienia\n jeśli chesz korzystać z aplikacji</string>
     <string name="back_pres">Aby wyjść z aplikacji, kliknij przycisk WSTECZ dwukrotnie</string>
-
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 
     <bool name="canUseLandscapeMode">false</bool>
 </resources>
