@@ -50,7 +50,7 @@ router.post('/cry', function(req,res, next){
 
 router.use(verifyToken);
 
-router.put('/user', function(req, res, next){
+router.post('/users', function(req, res, next){
   assert.equal(req.decoded.permissions, 'admin', "Access denied!");
   validateUserRequestData(req);
 
@@ -61,7 +61,7 @@ router.put('/user', function(req, res, next){
 });
 
 
-router.post('/user', function(req, res, next){
+router.put('/users', function(req, res, next){
   validateUserRequestData(req);
   firebird.attach(dbOptions, function(err, db){
     if(err){
@@ -81,6 +81,41 @@ router.post('/user', function(req, res, next){
               res.json({"sucess": true, "message": "Data updated successfully"});
             });
 
+  });
+
+});
+
+router.get('/locations', function(req, res, next){
+  var count = 200;
+  var offset = 0;
+  var fields = "";
+  assert.ok(req.query.hasOwnProperty('fields'), 'No fields property');
+  assert.ok(req.query.fields.length > 0, 'No fields specified');
+  fields = req.query.fields;
+
+  if(req.query.hasOwnProperty('count')){
+     assert.ok(validator.isInt(req.query.count, {"min":1, "max": 200}), 'count should be a value between 1 and 200');
+     count = parseInt(req.query.count);
+  }
+
+  if(req.query.hasOwnProperty('offset')){
+    assert.ok(validator.isInt(req.query.offset), 'offset is invalid');
+    offset = parseInt(req.query.offset);
+  }
+  firebird.attach(dbOptions, function(err, db){
+    if(err){
+      throw err;
+    }
+     var sqlQuery = "SELECT FIRST " + count + " SKIP " + offset + " " +
+                    helpers.escapeColumnNames(fields) + " FROM TOILET_VIEW";
+    console.log(sqlQuery);
+    db.query(sqlQuery, function(err, queryResult){
+      db.detach();
+      if(err){
+        return next(err);
+      }
+      res.json({"count": queryResult.length , "offset": offset, "data": queryResult});
+    });
   });
 
 });
@@ -149,7 +184,7 @@ function addUser(userData, callback){
  * @param  {Function} next callback called after completion
  */
 function verifyToken(req, res, next){
-  var token = req.body.token || req.query.token || req.headers['x-acces-token'];
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
   assert.ok(token, "No token provided, access denied!");
   jwt.verify(token, secretTokenKey, function(err, decoded){
     if(err){

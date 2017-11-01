@@ -24,6 +24,17 @@ var generateSalt = function(){
   return crypto.randomBytes(16).toString('base64');
 }
 
+
+function escapeColumnNames(inputString){
+  return inputString.toUpperCase().split(',').map(function(column){
+    if(column !== '*')
+      return '\"' + column + '\"';
+    else
+      return column;
+  }).join(',');
+}
+
 exports.readJSONFile = readJSONFile;
 exports.hashData = hashData;
 exports.generateSalt = generateSalt;
+exports.escapeColumnNames = escapeColumnNames;

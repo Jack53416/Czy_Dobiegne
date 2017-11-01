@@ -31,7 +31,7 @@ var convertToJSON = function (dbObj) {
             "street": row.STREET.toString("utf8")
         });
     }
-	
+
     return result;
 }
 
@@ -53,7 +53,7 @@ router.get("/", function (req, res) {
 			console.log(err);
 		}
 		console.log("result" + JSON.stringify(convertToJSON(result)));
-                res.status(200).json(convertToJSON(result));
+                res.status(200).json(result);
             });
         }
 
