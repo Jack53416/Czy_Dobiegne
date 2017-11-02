@@ -40,6 +40,11 @@ public class ActivityPermissions extends ActivityBase {
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(thisActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
                 }
+                if (ContextCompat.checkSelfPermission(mContext,
+                        Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(thisActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+                }
             }
         });
     }
@@ -48,7 +53,7 @@ public class ActivityPermissions extends ActivityBase {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case 1: {
+            case 1:{
 
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
