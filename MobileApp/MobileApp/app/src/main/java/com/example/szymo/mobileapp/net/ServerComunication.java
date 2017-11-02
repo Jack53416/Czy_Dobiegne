@@ -41,6 +41,7 @@ public class ServerComunication  implements HostnameVerifier {
 
     public ServerComunication(Context baseContext) {
         ctx = baseContext;
+        setSSLceritfication();
     }
 
     @Override
@@ -66,40 +67,7 @@ public class ServerComunication  implements HostnameVerifier {
 
     @NonNull
     private HttpURLConnection createConnection(final String url, final String method) throws IOException {
-        CertificateFactory cf = null;
-        try {
-            cf = CertificateFactory.getInstance("X.509");
 
-// From https://www.washington.edu/itconnect/security/ca/load-der.crt
-            AssetFileDescriptor fileDescriptor = ctx.getResources().openRawResourceFd(R.raw.cert);
-//            FileInputStream fis=(FileInputStream)ctx.getResources().openRawResource(R.raw.cert);
-            FileInputStream fis=fileDescriptor.createInputStream();
-        InputStream caInput = new BufferedInputStream(fis);
-        Certificate ca;
-        try {
-            ca = cf.generateCertificate(caInput);
-            System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
-        } finally {
-            caInput.close();
-        }
-
-// Create a KeyStore containing our trusted CAs
-        String keyStoreType = KeyStore.getDefaultType();
-        KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-        keyStore.load(null, null);
-        keyStore.setCertificateEntry("ca", ca);
-
-// Create a TrustManager that trusts the CAs in our KeyStore
-        String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-        tmf.init(keyStore);
-
-// Create an SSLContext that uses our TrustManager
-        SSLContext context = SSLContext.getInstance("TLS");
-        context.init(null, tmf.getTrustManagers(), null);
-
-            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier(this);
         HttpsURLConnection c = (HttpsURLConnection) new URL(url).openConnection();
         c.setRequestMethod(method);
         c.setRequestProperty("Content-Type", "application/json");
@@ -107,16 +75,7 @@ public class ServerComunication  implements HostnameVerifier {
         c.setConnectTimeout(ctx.getResources().getInteger(R.integer.timeout_medium));
         c.setReadTimeout(ctx.getResources().getInteger(R.integer.timeout_medium));
         return c;
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
-        }
-        return null;
+
     }
     private ServerRequestData handleServerResponse(final ServerRequestData data, final HttpsURLConnection c) throws IOException {
         int responseCode = c.getResponseCode();
@@ -183,6 +142,53 @@ public class ServerComunication  implements HostnameVerifier {
                     break;
             }
             return ctx.getString(resId,BaseUrl);
+        }
+    }
+
+    private void setSSLceritfication() {
+        CertificateFactory cf = null;
+        try {
+            cf = CertificateFactory.getInstance("X.509");
+
+// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+            AssetFileDescriptor fileDescriptor = ctx.getResources().openRawResourceFd(R.raw.cert);
+//            FileInputStream fis=(FileInputStream)ctx.getResources().openRawResource(R.raw.cert);
+            FileInputStream fis = fileDescriptor.createInputStream();
+            InputStream caInput = new BufferedInputStream(fis);
+            Certificate ca;
+            try {
+                ca = cf.generateCertificate(caInput);
+                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+            } finally {
+                caInput.close();
+            }
+
+// Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+
+// Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+// Create an SSLContext that uses our TrustManager
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, tmf.getTrustManagers(), null);
+            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(this);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        } catch (CertificateException e1) {
+            e1.printStackTrace();
+        } catch (NoSuchAlgorithmException e1) {
+            e1.printStackTrace();
+        } catch (KeyStoreException e1) {
+            e1.printStackTrace();
+        } catch (KeyManagementException e1) {
+            e1.printStackTrace();
         }
     }
 }
