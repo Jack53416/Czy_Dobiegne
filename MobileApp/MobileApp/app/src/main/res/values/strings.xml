@@ -7,4 +7,10 @@
     <string name="drawer_close">Close</string>
     <string name="no_data_label_default">No data</string>
     <bool name="canUseLandscapeMode">false</bool>
+
+
+
+    <string name="HelloWorld">%1$s/test</string>
+    <integer name="timeout_short" translatable="false">2000</integer>
+    <integer name="timeout_medium" translatable="false">10000</integer>
 </resources>

@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.example.szymo.mobileapp.net.ServerComunication;
+
 /**
  * Created by szymo on 25.10.2017.
  */
@@ -56,6 +58,7 @@ public abstract class FragmentBase extends android.support.v4.app.Fragment {
     public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+
         mNoDataFrame = view.findViewById(R.id.no_data_frame);
         if (mNoDataFrame != null && mNoDataFrame instanceof TextView)
         {
@@ -72,6 +75,7 @@ public abstract class FragmentBase extends android.support.v4.app.Fragment {
         {
             throw new RuntimeException("Parent activity has to implement activity access");
         }
+
 
     }
 

@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.szymo.mobileapp.controls.FakeCAB;
+import com.example.szymo.mobileapp.net.ServerComunication;
 
 public class ActivityMain extends ActivityBase implements IActivityAccess,NavigationView.OnNavigationItemSelectedListener {
 
@@ -27,7 +28,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
     private ActionBarDrawerToggle mToggle;
     private int mPreviousDrawerLockMode = DrawerLayout.LOCK_MODE_UNLOCKED;
     private View mProgress;
-
+    public ServerComunication mServerComunication;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +39,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         initFakeCAB();
+        initServerComunity();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (mDrawerLayout != null)
@@ -106,7 +108,9 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         mFakeCAB = (FakeCAB) findViewById(R.id.main_fake_cab);
         mFakeCAB.init();
     }
-
+    private void initServerComunity(){
+        mServerComunication=new ServerComunication(getBaseContext());
+    }
     @Override
     public FakeCAB accessCAB() {
         return mFakeCAB;
