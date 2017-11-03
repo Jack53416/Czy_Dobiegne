@@ -5,7 +5,7 @@ package com.example.szymo.mobileapp.data;
  */
 
 public class WCData {
-    public int  Longitude;
-    public int Latitude;
+    public double  Longitude;
+    public double Latitude;
     public String name;
 }

@@ -17,7 +17,9 @@ import android.view.ViewGroup;
 
 import android.location.LocationListener;
 
+import com.example.szymo.mobileapp.data.WCData;
 import com.example.szymo.mobileapp.net.ServerComunication;
+import com.example.szymo.mobileapp.parser.WcParser;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -103,7 +105,7 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
     private void setLocalizationOnMap() {
         if (mLocation != null) {
             LatLng position = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
+
             mProgressBar.setVisibility(View.GONE);
 
             Geocoder geocoder=new Geocoder(getContext());
@@ -176,7 +178,17 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
         public void OnResponseReceived(final int code, final String data)
         {
            if(data!=null){
+               try {
+                   List<WCData> listWC= new WcParser().parser(data);
 
+                   if(listWC!=null){
+                       for(int i=0;i<listWC.size();i++){
+                       mMap.addMarker(new MarkerOptions().position(new LatLng(listWC.get(i).Latitude,listWC.get(i).Longitude))).setTitle(listWC.get(i).name);
+                   }
+                   }
+               } catch (JSONException e) {
+                   e.printStackTrace();
+               }
            }
 
         }
