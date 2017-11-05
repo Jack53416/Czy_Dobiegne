@@ -1,0 +1,8 @@
+$icon-font-path: '~bootstrap-sass/assets/fonts/bootstrap/';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap';
+@import '_custom-variables';
+@import 'sideBarMenu';
+
+body{
+    background-color: rgb(219, 236, 255);
+}
