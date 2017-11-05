@@ -8,6 +8,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 
+import com.crashlytics.android.Crashlytics;
+
+import io.fabric.sdk.android.Fabric;
+
 import static java.lang.Thread.MAX_PRIORITY;
 import static java.lang.Thread.sleep;
 
@@ -22,6 +26,7 @@ public class ActivitySplash extends ActivityBase {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.activity_splash);
 

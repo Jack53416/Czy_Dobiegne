@@ -3,10 +3,9 @@ package com.example.szymo.mobileapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.Address;
 import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -15,11 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.location.LocationListener;
-
 import com.example.szymo.mobileapp.data.WCData;
 import com.example.szymo.mobileapp.net.ServerComunication;
 import com.example.szymo.mobileapp.parser.WcParser;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -31,8 +29,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 
-import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 //import android.location.Location;
@@ -51,6 +47,8 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
     private LocationManager mLocationManager;
     private Marker myPosition;
     ServerComunication serverComunication;
+    CameraUpdate zoom;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -67,14 +65,13 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume();
-        //mMapView.onResume();
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
             Log.e("Problem with map :", e.toString());
         }
-        serverComunication=((ActivityMain)getActivity()).mServerComunication;
-        serverComunication.send(ServerComunication.RequestType.MARKER,new OnServerDataResponseReceived());
+        serverComunication = ((ActivityMain) getActivity()).mServerComunication;
+        serverComunication.send(ServerComunication.RequestType.MARKER, new OnServerDataResponseReceived());
         setLocation();
         mMapView.getMapAsync(this);
         return inflated;
@@ -88,7 +85,7 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
         String provider = mLocationManager.getBestProvider(criteria, false);
         mLocation = mLocationManager.getLastKnownLocation(provider);
 
-        mLocationManager.requestLocationUpdates(provider, 100, 1, this);
+        mLocationManager.requestLocationUpdates(provider, 0, 0, this);
     }
 
     @Override
@@ -98,27 +95,33 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
             ((ActivityMain) getActivity()).goToPermissionActivity();
         }
         mMap.setMyLocationEnabled(true);
-        setLocalizationOnMap();
+        if (mMap.getMyLocation() != null) {
+            Log.i(mMap.getMyLocation().toString(), "");
+        }
+
 
     }
 
     private void setLocalizationOnMap() {
         if (mLocation != null) {
             LatLng position = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-
+            if (zoom == null) {
+                zoom = CameraUpdateFactory.newLatLngZoom(position, 15);
+                mMap.animateCamera(zoom);
+            }
             mProgressBar.setVisibility(View.GONE);
 
-            Geocoder geocoder=new Geocoder(getContext());
-            List<Address> addresses;
-            try {
-                addresses=geocoder.getFromLocationName("Dobroń, kaczeńcowa 1",1);
-                if(addresses.size() > 0){
-
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(0).getLatitude(),addresses.get(0).getLongitude()))).setTitle("test");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            Geocoder geocoder=new Geocoder(getContext());
+//            List<Address> addresses;
+//            try {
+//                addresses=geocoder.getFromLocationName("Dobroń, kaczeńcowa 1",1);
+//                if(addresses.size() > 0){
+//
+//                    mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(0).getLatitude(),addresses.get(0).getLongitude()))).setTitle("test");
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 
@@ -173,23 +176,22 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
         Log.i("onstatus Chaged", s);
     }
 
-    private class OnServerDataResponseReceived implements ServerComunication.IOnResponseReceived    {
+    private class OnServerDataResponseReceived implements ServerComunication.IOnResponseReceived {
         @Override
-        public void OnResponseReceived(final int code, final String data)
-        {
-           if(data!=null){
-               try {
-                   List<WCData> listWC= new WcParser().parser(data);
+        public void OnResponseReceived(final int code, final String data) {
+            if (data != null) {
+                try {
+                    List<WCData> listWC = new WcParser().parser(data);
 
-                   if(listWC!=null){
-                       for(int i=0;i<listWC.size();i++){
-                       mMap.addMarker(new MarkerOptions().position(new LatLng(listWC.get(i).Latitude,listWC.get(i).Longitude))).setTitle(listWC.get(i).name);
-                   }
-                   }
-               } catch (JSONException e) {
-                   e.printStackTrace();
-               }
-           }
+                    if (listWC != null) {
+                        for (int i = 0; i < listWC.size(); i++) {
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(listWC.get(i).Latitude, listWC.get(i).Longitude))).setTitle(listWC.get(i).name);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
         }
     }
