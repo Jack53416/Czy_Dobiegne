@@ -26,15 +26,15 @@ class Menu extends React.Component {
                        
                     </Navbar.Text>
                     <Nav>
-                        <NavDropdown eventKey={1} title="Item 1">
+                        <NavDropdown id="dropdown1" eventKey={1} title="Item 1">
                             <MenuItem eventKey={1.1} href="#">Item 1.1</MenuItem>
                         </NavDropdown>
                         <NavItem eventKey={2}>Item 2</NavItem>
                         <NavItem eventKey={3}>Item 3</NavItem>
                     </Nav>
                     <Nav pullRight>
-                        <NavItem eventKey={1} href="#"><Glyphicon glyph="user"/> Zarejestruj się</NavItem>
-                        <NavItem eventKey={2} href="#"><Glyphicon glyph="log-in"/> Zaloguj</NavItem>
+                        <NavItem href="#"><Glyphicon glyph="user"/> Zarejestruj się</NavItem>
+                        <NavItem href="#"><Glyphicon glyph="log-in"/> Zaloguj</NavItem>
                     </Nav>
                 </Navbar.Collapse>
 
