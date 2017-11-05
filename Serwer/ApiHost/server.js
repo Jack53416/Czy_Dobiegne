@@ -4,8 +4,14 @@ var helmet = require('helmet');
 var router = require("./router.js");
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
+const https = require('https');
+const fs = require('fs');
 
 var port = 8080;
+const sslOptions = {
+  cert: fs.readFileSync('cert.pem'),
+  key: fs.readFileSync('key.pem')
+};
 
 var app = express();
 app.use(bodyParser.json());
@@ -20,9 +26,11 @@ app.use(express.static('Scripts'));
 
 router(app);
 
-
 app.get('/', function (req, res) {
     res.render("index.ejs");
 });
 
-app.listen(port);
+
+
+//app.listen(port);
+https.createServer(sslOptions, app).listen(443);
