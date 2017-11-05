@@ -1,8 +1,12 @@
 package com.example.szymo.mobileapp;
 
+import android.content.Context;
+import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.szymo.mobileapp.controls.FakeCAB;
+import com.example.szymo.mobileapp.net.ServerComunication;
 
 public class ActivityMain extends ActivityBase implements IActivityAccess,NavigationView.OnNavigationItemSelectedListener {
 
@@ -23,7 +28,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
     private ActionBarDrawerToggle mToggle;
     private int mPreviousDrawerLockMode = DrawerLayout.LOCK_MODE_UNLOCKED;
     private View mProgress;
-
+    public ServerComunication mServerComunication;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +39,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         initFakeCAB();
+        initServerComunity();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (mDrawerLayout != null)
@@ -48,6 +54,14 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         mNavigationView.setCheckedItem(R.id.nav_main);
         mProgress = findViewById(R.id.progress);
         mProgress.setVisibility(View.GONE);
+
+        supportInvalidateOptionsMenu();
+
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        final FragmentMain frag = new FragmentMain();
+        ft.replace(R.id.main_content, frag);
+        ft.commit();
+
     }
 
     @Override
@@ -76,6 +90,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
             Log.e(String.valueOf(this),"Missing menu entries for add handling");
             return false;
         }
+
         itemAddLocalization.setIcon(R.drawable.ic_location);
         return super.onCreateOptionsMenu(menu);
     }
@@ -93,7 +108,9 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         mFakeCAB = (FakeCAB) findViewById(R.id.main_fake_cab);
         mFakeCAB.init();
     }
-
+    private void initServerComunity(){
+        mServerComunication=new ServerComunication(getBaseContext());
+    }
     @Override
     public FakeCAB accessCAB() {
         return mFakeCAB;
@@ -105,5 +122,11 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
 
         mFakeCAB.reset();
         return true;
+    }
+    public void goToPermissionActivity()
+    {
+        Intent intent=new Intent(this, ActivityPermissions.class);
+        startActivity(intent);
+        finish();
     }
 }

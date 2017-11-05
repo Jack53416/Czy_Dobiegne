@@ -4,13 +4,20 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-feature android:name="android.hardware.location.gps" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:label="@string/app_name"
         android:theme="@style/AppTheme.NoActionBar">
-
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDp_CjKSANoQ9SQxoy8Xv4gGT_WNaD0SCo"/>
 
         <activity android:name=".ActivitySplash">
             <intent-filter>
@@ -26,6 +33,10 @@
         <activity android:name=".ActivityPermissions"
             android:windowSoftInputMode="adjustPan">
         </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="04b3a0803b04f1060ea06c47b508a7dbbf006874" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
