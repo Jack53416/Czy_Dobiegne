@@ -3,6 +3,22 @@ var fs = require("fs");
 var crypto = require('crypto');
 
 
+const readDirectorySync = (dir, usrFilter) =>
+ fs.readdirSync(dir)
+    .reduce((files, file) =>
+    {
+        var filepath = dir + '/' + file;
+        if(fs.statSync(filepath).isDirectory())
+          return files.concat(readDirectorySync(filepath))
+        else
+          return files.concat(filepath);
+
+    }, [])
+    .filter((element) => {
+      var extension = path.extname(element);
+      return usrFilter === undefined || extension === usrFilter;
+    });
+
 var readJSONFile = function (fileName) {
     if (!fs.existsSync(fileName)) {
         console.log("unable to open file: " + fileName);
@@ -38,3 +54,4 @@ exports.readJSONFile = readJSONFile;
 exports.hashData = hashData;
 exports.generateSalt = generateSalt;
 exports.escapeColumnNames = escapeColumnNames;
+exports.readDirectorySync = readDirectorySync;
