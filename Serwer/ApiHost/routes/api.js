@@ -19,17 +19,16 @@ router.use(function(req, res, next){
 router.post('/auth', function(req, res, next){
   assert.ok(req.body.hasOwnProperty('password'), 'no password given!');
   assert.ok(req.body.hasOwnProperty('username'), 'no username given!');
-
-
   findUser(req.body.username, res, next);
+
 }, function(req, res, next){
   if(checkCredentials(res.locals.userData, req.body.password) === false){
     next(new Error("Invalid password!"));
   }
   else{
       const payload = {
-        "userID": res.locals.userData.ID,
-        "permissions": res.locals.userData.PERMISSIONS
+        "userID": res.locals.userData.id,
+        "permissions": res.locals.userData.permissions
       };
 
       var token = jwt.sign(payload, secretTokenKey, {"expiresIn" : 300});
@@ -121,7 +120,6 @@ router.get('/locations', function(req, res, next){
 });
 router.use(ErrorHandlerGeneric);
 
-
 /**
  * generates userData object with data required by the database
  * @param  {object} req request express object
@@ -206,7 +204,7 @@ function checkCredentials(userData, requestPassword){
                              requestPassword + userData.SALT,
                              'base64');
 
-  if(userData.PASSWORD === encryptedFromRequest ){
+  if(userData.password === encryptedFromRequest ){
     return true;
   }
   return false;
