@@ -1,6 +1,7 @@
 "use strict"
 var fs = require("fs");
 var crypto = require('crypto');
+var path = require('path');
 
 
 const readDirectorySync = (dir, usrFilter) =>

@@ -7,7 +7,7 @@ var makeServerPath = (basePath, scriptPath) =>
 
 
 var createRoutes = function (app) {
-  var routeList = readDirectorySync('./routes', '.js')
+  var routeList = helpers.readDirectorySync('./routes', '.js')
    for (route of routeList) {
      var handler = require(route);
      var pth = makeServerPath('./routes', route);
