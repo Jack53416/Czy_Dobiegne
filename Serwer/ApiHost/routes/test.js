@@ -5,7 +5,84 @@ var fb = require('node-firebird');
 var helpers = require('../helpers.js')
 var database = require('../database.js');
 
+/**
+ * @swagger
+ * definitions:
+ *   Location:
+ *     properties:
+ *       price_min:
+ *         type: number
+ *         format: double
+ *       price_max:
+ *         type: number
+ *         format: double
+ *       rating:
+ *         type: number
+ *         format: double
+ *       vote_nr:
+ *         type: number
+ *         format: integer
+ *       date_added:
+ *         type: string
+ *         format: date-time
+ *       name:
+ *         type: string
+ *       city:
+ *         type: string
+ *       street:
+ *         type: string
+ *       longitude:
+ *         type: number
+ *         format: double
+ *       latitude:
+ *         type: number
+ *         format: double
+ *   ApiResponse:
+ *     type: object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *       message:
+ *         type: string
+ */
 
+/**
+  * @swagger
+  * securityDefinitions:
+  *   bearerAuth:
+  *     type: apiKey
+  *     name: x-access-token
+  *     in: header
+ */
+
+
+ /**
+  * @swagger
+  * /test/:
+  *   get:
+  *     tags:
+  *       - Test
+  *     description: Returns frist 200 locations in the database
+  *     produces:
+  *       - application/json
+  *     responses:
+  *       200:
+  *         description: response object with location list
+  *         schema:
+  *           type: object
+  *           properties:
+  *             count:
+  *               type: integer
+  *             offset:
+  *               type: integer
+  *             data:
+  *               type: array
+  *               items:
+  *                 $ref: '#/definitions/Location'
+  *
+  *       500:
+  *         description: general server error
+  */
 
 router.get("/", function (req, res, next) {
   var count = 200;
