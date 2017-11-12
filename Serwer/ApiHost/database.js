@@ -19,7 +19,32 @@ function UserData(username, email, password){
   this.passwordEncrypted = helpers.hashData('sha256', this.password + this.salt, 'base64');
 }
 
+/**
+ * Creates new instance of QueryOptions object
+ * @param   {Int}      count  specifies max quantity of records(max 200)
+ * @param   {Int}      offset specifies offset of the requested records (0 - n)
+ * @param   {string}   fields specifies fields for the request(ex.id,name.. ), all(*)
+ * @param   {string}   whereString where string with ? marks as parameters
+ * @param   {string}   whereParams parameters for where string
+ * @constructor
+ */
+function QueryOptions(count, offset, fields, whereString, whereParams){
+  this.count = count;
+  this.offset = offset;
+  this.fields = helpers.escapeColumnNames(fields);
+  whereString === undefined ? this.whereString = "" : this.whereString = " WHERE " + whereString;
+  whereParams === undefined ? this.whereParams = [] : this.whereParams = whereParams;
+}
 
+/**
+ * Returns simple query string of pattern Select First {count} Skip {offset} from {tableName} Where {whereString}{whereParams}
+ * @param  {string} tableName name of the table to query
+ * @return {string}           query string
+ */
+QueryOptions.prototype.getSimpleQuery = function(tableName){
+  return "SELECT FIRST " + this.count + " SKIP " + this.offset + " " +
+                 this.fields + " FROM " + tableName + this.whereString;
+}
 /**
  * adds user to the databsae based od userData
  * @param {UserData} userData userData object, contains(username, email, password, passwordEncrypted, salt)
@@ -104,34 +129,32 @@ function updateUser(userData, id, next){
 
 /**
  * Gets given number of locations with a given ofsset and specified fields
- * @param  {Int}      count  specifies max quantity of records(max 200)
- * @param  {Int}      offset specifies offset of the requested records (0 - n)
- * @param  {string}   fields specifies fields for the request(ex.id,name.. ), all(*)
- * @param  {res}      res    response express object
- * @param  {Function} next   express callback
- * @return {Function}        invocation of the provided callback
+ * @param  {QueryOptions} queryOptions   QueryOptions object
+ * @param  {res}          res            response express object
+ * @param  {Function}     next           express callback
+ * @return {Function}                    invocation of the provided callback
  */
 
-function getLocations(count, offset, fields, res, next){
+function getLocations(queryOptions, res, next){
   firebird.attach(dbOptions, function(err, db){
     if(err){
       throw err;
     }
-     var sqlQuery = "SELECT FIRST " + count + " SKIP " + offset + " " +
-                    helpers.escapeColumnNames(fields) + " FROM TOILET_VIEW";
+     var sqlQuery = queryOptions.getSimpleQuery('TOILET_VIEW');
     console.log(sqlQuery);
-    db.query(sqlQuery, function(err, queryResult){
+    db.query(sqlQuery, queryOptions.whereParams, function(err, queryResult){
       db.detach();
       if(err){
         return next(err);
       }
-      res.json({"count": queryResult.length , "offset": offset, "data": queryResult});
+      res.json({"count": queryResult.length , "offset": queryOptions.offset, "data": queryResult});
     });
   });
 }
 
 exports.dbOptions = dbOptions;
 exports.UserData = UserData;
+exports.QueryOptions = QueryOptions;
 exports.addUser = addUser;
 exports.findUser = findUser;
 exports.updateUser = updateUser;

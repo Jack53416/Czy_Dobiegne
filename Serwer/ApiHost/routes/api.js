@@ -71,7 +71,7 @@ router.post('/auth', function(req, res, next){
 
       res.status(200).json({"success": true,
                             "token": token,
-                            "message": "Token valid 5 minutes"});
+                            "message": "Token valid 30 minutes"});
   }
 });
 
@@ -81,28 +81,14 @@ router.post('/cry', function(req,res, next){
             "salt": salt});
 });
 
-
-router.get('/query/locations', function(req, res, next){
-    assert.ok(req.query.hasOwnProperty('where'), "No query expression provideed!");
-    assert.ok(req.query.where.length > 0, "No query expression provided!");
-    try{
-      var query = sqlParser.parse(req.query.where);
-      res.json(query);
-    }
-    catch(exception){
-      next("Invalid where query!");
-    }
-
-});
-
-
-
-
 router.use(authorize.verifyToken);
+
 /**
  * @swagger
  * /api/user:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *       - User
  *     description: Adds a new user
@@ -157,6 +143,8 @@ router.post('/user', function(req, res, next){
  * @swagger
  * /api/user:
  *   put:
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *       - User
  *     description: Modifies existing user. In case field doesn't need to be changed send old data
@@ -208,7 +196,7 @@ router.put('/user', function(req, res, next){
 
 /**
  * @swagger
- * /api/locations:
+ * /api/locations/{city}:
  *   get:
  *     security:
  *       - bearerAuth: []
@@ -218,6 +206,12 @@ router.put('/user', function(req, res, next){
  *     produces:
  *       - application/json
  *     parameters:
+ *       - name: city
+ *         description: city name for which query returns the Locations
+ *         in: path
+ *         required: true
+ *         type: string
+ *
  *       - name: count
  *         description: max records in response, limit = 200
  *         in: query
@@ -235,7 +229,7 @@ router.put('/user', function(req, res, next){
  *         format: integer
  *
  *       - name: fields
- *         description: fields to be returned by the request
+ *         description: comma separated array list of fields to be returned by the request - * for all
  *         in: query
  *         required: true
  *         type: string
@@ -258,29 +252,136 @@ router.put('/user', function(req, res, next){
  *         schema:
  *           $ref: '#/definitions/ApiResponse'
  */
-router.get('/locations', function(req, res, next){
+
+ router.get('/locations/:city', function(req, res, next){
+   var count = 200;
+   var offset = 0;
+   var fields = "";
+   var city = "";
+
+   var querySettings = validateStandardQuery(req.query);
+   database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, 'CITY = ?', [req.params.city]), res, next);
+
+ });
+
+ /**
+  * @swagger
+  * /api/query/locations:
+  *   get:
+  *     security:
+  *       - bearerAuth: []
+  *     tags:
+  *       - Locations
+  *     description: Returns a list of locations for a specified query
+  *     produces:
+  *       - application/json
+  *     parameters:
+  *       - name: latitude
+  *         description: simple condition list for latitude ex.>50.23
+  *         in: query
+  *         required: true
+  *         type: array
+  *         items:
+  *           type: string
+  *       - name: longitude
+  *         description: simple condition list for longitude ex <=19.233
+  *         in: query
+  *         required: true
+  *         type: array
+  *         items:
+  *           type: string
+  *
+  *       - name: count
+  *         description: max records in response, limit = 200
+  *         in: query
+  *         required: false
+  *         type: number
+  *         format: integer
+  *         minimum: 0
+  *         maximum: 200
+  *
+  *       - name: offset
+  *         description: offset for records (0 .. n)
+  *         in: query
+  *         required: false
+  *         type: number
+  *         format: integer
+  *
+  *       - name: fields
+  *         description: comma separated array list of fields to be returned by the request - * for all
+  *         in: query
+  *         required: true
+  *         type: string
+  *     responses:
+  *       200:
+  *         description: response object with location list
+  *         schema:
+  *           type: object
+  *           properties:
+  *             count:
+  *               type: integer
+  *             offset:
+  *               type: integer
+  *             data:
+  *               type: array
+  *               items:
+  *                 $ref: '#/definitions/Location'
+  *       500:
+  *         description: general server error
+  *         schema:
+  *           $ref: '#/definitions/ApiResponse'
+  */
+
+ router.get('/query/locations', function(req, res, next){
+   assert.ok(req.query.hasOwnProperty('latitude'), "No latitude conditions provided");
+   assert.ok(req.query.latitude.length > 0, "No latitude expression provided!");
+   assert.ok(req.query.hasOwnProperty('longitude'), "No longitude conditions provided");
+   assert.ok(req.query.latitude.length > 0, "No latitude expression provided!");
+
+   var querySettings = validateStandardQuery(req.query);
+
+   var longitude = req.query.longitude.split(',');
+   var latitude = req.query.latitude.split(',');
+   var re = /^([><=]|>=|<=)(\d+(\.\d+)?)$/;
+   longitude.forEach( (item, idx, array) =>{
+     assert.ok(re.exec(item) != null, "Invalid expression " + item);
+     array[idx] =  item.replace(re, "LONGITUDE $1 $2");
+   });
+
+   latitude.forEach( (item, idx, array) =>{
+     assert.ok(re.exec(item) != null, "Invalid expression " + item);
+     array[idx] =  item.replace(re, "LATITUDE $1 $2");
+   });
+   var whereQuery = latitude.join(" AND ") + " AND " + longitude.join( " AND ");
+   database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, whereQuery), res, next);
+
+ });
+
+router.use(ErrorHandlerGeneric);
+
+
+function validateStandardQuery(query){
   var count = 200;
   var offset = 0;
   var fields = "";
-  assert.ok(req.query.hasOwnProperty('fields'), 'No fields property');
-  assert.ok(req.query.fields.length > 0, 'No fields specified');
-  fields = req.query.fields;
 
-  if(req.query.hasOwnProperty('count')){
-     assert.ok(validator.isInt(req.query.count, {"min":1, "max": 200}), 'count should be a value between 1 and 200');
-     count = parseInt(req.query.count);
+  assert.ok(query.hasOwnProperty('fields'), 'No fields property');
+  assert.ok(query.fields.length > 0, 'No fields specified');
+
+  fields = query.fields;
+
+  if(query.hasOwnProperty('count')){
+     assert.ok(validator.isInt(query.count, {"min":1, "max": 200}), 'count should be a value between 1 and 200');
+     count = parseInt(query.count);
   }
 
-  if(req.query.hasOwnProperty('offset')){
-    assert.ok(validator.isInt(req.query.offset), 'offset is invalid');
-    offset = parseInt(req.query.offset);
+  if(query.hasOwnProperty('offset')){
+    assert.ok(validator.isInt(query.offset), 'offset is invalid');
+    offset = parseInt(query.offset);
   }
+  return {count: count, offset: offset, fields : fields};
 
-  database.getLocations(count, offset, fields, res, next);
-
-});
-router.use(ErrorHandlerGeneric);
-
+}
 /**
  * validetes username, email, password in request containting userData
  * @param  {req} req request express object

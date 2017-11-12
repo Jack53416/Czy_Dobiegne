@@ -3,7 +3,7 @@ var jwt = require('jsonwebtoken');
 var assert = require('assert');
 
 var secretTokenKey = helpers.generateSalt();
-const tokenExpireTime = 300;
+const tokenExpireTime = 30 * 60;
 
 /**
  * Instantiate TokenPayload object
@@ -21,9 +21,13 @@ function TokenPayload(userId, permissions){
  * @param  {TokenPayload} tokenPayload TokenPayload object
  * @return {string}             token
  */
-TokenPayload.prototype.getToken = () =>
-  jwt.sign({"userId" : this.userId, "permissions": this.permissions}, secretTokenKey, {"expiresIn" : tokenExpireTime});
-
+TokenPayload.prototype.getToken = function(){
+  const payload ={
+    "userId" : this.userId,
+    "permissions": this.permissions
+  };
+  return jwt.sign(payload, secretTokenKey, {"expiresIn" : tokenExpireTime});
+}
 
 /**
  * Express function, verifies validity of a token given in req express object
