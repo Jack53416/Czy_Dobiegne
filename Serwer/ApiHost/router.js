@@ -1,40 +1,25 @@
-﻿"use-strict"; 
-var fs = require("fs");
+﻿"use-strict";
 var path = require("path");
+var helpers = require("./helpers.js");
 
-var readDir = function (directory, filter, callback) {
-    fs.readdir(directory, function (err, list) {
-        if (err) {
-            return callback(err);
-        }
-        var data = new Array();
-        filter = "." + filter;
-        for (var i = 0; i < list.length; i++) {
-            if (path.extname(list[i]) === filter || filter === ".*")
-                data.push(list[i]);
-        }
-        callback(null, data);
-    });
-};
+var makeServerPath = (basePath, scriptPath) =>
+  scriptPath.substring(basePath.length, scriptPath.length - '.js'.length);
+
 
 var createRoutes = function (app) {
-    readDir("./routes", "js", function (err, data) {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        for (route of data) {
-            var handler = require("./routes/" + route);
-            var pth = "/" + path.basename(route, '.js');
-            console.log("path " + pth);
-            console.log("handler: " + "./routes/" + route);
-            app.use(pth, handler);
-        }
+  var routeList = helpers.readDirectorySync('./routes', '.js')
+   for (route of routeList) {
+     var handler = require(route);
+     var pth = makeServerPath('./routes', route);
+     console.log("path: " + pth);
+     console.log("handler: " + route);
+     app.use(pth, handler);
+   }
 
-        app.get('*', function (req, res) {
-            res.send("Invalid URL");
-        });
-    });
-};
+   app.get('*', function (req, res) {
+       res.send("Invalid URL");
+   });
+
+ };
 
 module.exports = createRoutes;
