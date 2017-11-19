@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.szymo.mobileapp.controls.FakeCAB;
+import com.example.szymo.mobileapp.net.GoogleComunication;
 import com.example.szymo.mobileapp.net.ServerComunication;
 
 public class ActivityMain extends ActivityBase implements IActivityAccess,NavigationView.OnNavigationItemSelectedListener {
@@ -29,6 +30,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
     private int mPreviousDrawerLockMode = DrawerLayout.LOCK_MODE_UNLOCKED;
     private View mProgress;
     public ServerComunication mServerComunication;
+    public GoogleComunication mgoogleComunication;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +41,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         initFakeCAB();
-        initServerComunity();
+        initComunity();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (mDrawerLayout != null)
@@ -108,8 +110,9 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         mFakeCAB = (FakeCAB) findViewById(R.id.main_fake_cab);
         mFakeCAB.init();
     }
-    private void initServerComunity(){
+    private void initComunity(){
         mServerComunication=new ServerComunication(getBaseContext());
+        mgoogleComunication=new GoogleComunication(getBaseContext());
     }
     @Override
     public FakeCAB accessCAB() {

@@ -37,7 +37,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class ServerComunication  implements HostnameVerifier {
 
-    public Context ctx;
+    private Context ctx;
 
     public ServerComunication(Context baseContext) {
         ctx = baseContext;
