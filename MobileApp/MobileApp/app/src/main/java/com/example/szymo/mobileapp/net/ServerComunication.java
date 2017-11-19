@@ -40,7 +40,8 @@ import javax.net.ssl.TrustManagerFactory;
 public class ServerComunication  implements HostnameVerifier {
 
     private Context ctx;
-
+    private String serverUrl="https://35.165.124.185";
+    private String clientToken;
     public ServerComunication(Context baseContext) {
         ctx = baseContext;
         setSSLceritfication();
@@ -58,10 +59,13 @@ public class ServerComunication  implements HostnameVerifier {
     public interface IOnResponseReceived {
         void OnResponseReceived(final int code, final String data);
     }
-    public boolean send(@NonNull final RequestType type,final IOnResponseReceived callback){
+    public void setToken(String token){
+        clientToken=token;
+    }
+    public boolean send(@NonNull final RequestType type,final IOnResponseReceived callback,String...var){
        switch (type){
            case MARKER:
-               new RequestDataFromServer().execute(new ServerRequestData(type,callback));
+               new RequestDataFromServer().execute(new ServerRequestData(type,callback,var));
                return true;
            case LOGIN:
                new RequestPostFromServer().execute(new ServerRequestData(type,callback));
@@ -132,7 +136,7 @@ public class ServerComunication  implements HostnameVerifier {
         protected ServerRequestData doInBackground(ServerRequestData... serverRequestData) {
             final ServerRequestData data = serverRequestData[0];
             try{
-                String serverUrl="https://35.165.124.185";
+
                 String login_pasword="username=admin&password=dupa34";
                 byte[]postData=login_pasword.getBytes();
                 String url=requestUrl(serverUrl,data.mType);
@@ -173,9 +177,11 @@ public class ServerComunication  implements HostnameVerifier {
         protected ServerRequestData doInBackground(ServerRequestData... serverRequestData) {
             final ServerRequestData data = serverRequestData[0];
             try{
-            String serverUrl="https://35.165.124.185";
-            String url=requestUrl(serverUrl,data.mType);
+            String url=requestUrl(serverUrl,data.mType,data.mUrlVariables);
             HttpsURLConnection c = (HttpsURLConnection) createConnection(url, "GET");
+            if(clientToken!=null){
+            c.setRequestProperty("x-access-token",clientToken);
+            }
             return handleServerResponse(data, c);
         } catch (Exception e) {
             Log.e(String.valueOf(this), "exception during sending command to ESH", e);
@@ -188,16 +194,17 @@ public class ServerComunication  implements HostnameVerifier {
                 data.mCallback.OnResponseReceived(data.getCode(), data.mData);
             }
         }
-        private String requestUrl(final String BaseUrl,final RequestType type){
+        private String requestUrl(final String BaseUrl,final RequestType type,String ...var){
             final int resId;
             switch (type){
                 default:
                     return  null;
                 case MARKER:
-                    resId= R.string.HelloWorld;
-                    break;
+                    resId= R.string.queryPosition;
+                    return  ctx.getString(resId,BaseUrl,"%3E%3D"+var[0],"%3C%3D"+var[1],"%3E%3D"+var[2],"%3C%3D"+var[3]);
+
             }
-            return ctx.getString(resId,BaseUrl);
+
         }
     }
 

@@ -11,7 +11,7 @@
     <string name="time">Czas :</string>
 
 
-    <string name="HelloWorld">%1$s/test</string>
+    <string name="queryPosition">%1$s/api/query/locations?latitude=%2$s,%3$s&amp;longitude=%4$s,%5$s&amp;fields=*</string>
     <string name="signin">%1$s/api/auth</string>
     <string name="GoooleDistance">http://maps.googleapis.com/maps/api/distancematrix/json?units=metric&amp;origins=%1$s,%2$s&amp;destinations=%3$s%4$s&amp;sensor=false&amp;mode=walking</string>
     <integer name="timeout_short" translatable="false">2000</integer>

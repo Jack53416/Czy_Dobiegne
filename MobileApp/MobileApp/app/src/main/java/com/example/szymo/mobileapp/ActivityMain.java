@@ -154,6 +154,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
             if (data != null) {
                 try {
                     mAccountInfo=new AccountInfoParser().parse(data);
+                    mServerComunication.setToken(mAccountInfo.mUserId);
                     mAccountInfo.save(mPrefs);
                 onAccountInfoChanged();
                 } catch (JSONException e) {
