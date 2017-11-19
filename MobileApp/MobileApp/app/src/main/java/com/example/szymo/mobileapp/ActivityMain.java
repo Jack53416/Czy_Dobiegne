@@ -6,6 +6,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,8 +18,19 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.szymo.mobileapp.controls.FakeCAB;
+import com.example.szymo.mobileapp.data.AccountInfo;
+import com.example.szymo.mobileapp.data.WCData;
 import com.example.szymo.mobileapp.net.GoogleComunication;
 import com.example.szymo.mobileapp.net.ServerComunication;
+import com.example.szymo.mobileapp.parser.AccountInfoParser;
+import com.example.szymo.mobileapp.parser.WcParser;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONException;
+
+import java.util.List;
 
 public class ActivityMain extends ActivityBase implements IActivityAccess,NavigationView.OnNavigationItemSelectedListener {
 
@@ -31,6 +43,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
     private View mProgress;
     public ServerComunication mServerComunication;
     public GoogleComunication mgoogleComunication;
+    private AccountInfo mAccountInfo;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,11 +72,11 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
 
         supportInvalidateOptionsMenu();
 
+        mAccountInfo = new AccountInfo(mPrefs);
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         final FragmentMain frag = new FragmentMain();
         ft.replace(R.id.main_content, frag);
         ft.commit();
-
     }
 
     @Override
@@ -113,6 +126,8 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
     private void initComunity(){
         mServerComunication=new ServerComunication(getBaseContext());
         mgoogleComunication=new GoogleComunication(getBaseContext());
+
+        mServerComunication.send(ServerComunication.RequestType.LOGIN,new OnServerDataResponseReceived());
     }
     @Override
     public FakeCAB accessCAB() {
@@ -131,5 +146,29 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         Intent intent=new Intent(this, ActivityPermissions.class);
         startActivity(intent);
         finish();
+    }
+
+    private class OnServerDataResponseReceived implements ServerComunication.IOnResponseReceived {
+        @Override
+        public void OnResponseReceived(final int code, final String data) {
+            if (data != null) {
+                try {
+                    mAccountInfo=new AccountInfoParser().parse(data);
+                    mAccountInfo.save(mPrefs);
+                onAccountInfoChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+    private void onAccountInfoChanged()
+    {
+        final Fragment currentFrag = getSupportFragmentManager().findFragmentById(R.id.main_content);
+        if (currentFrag != null && currentFrag instanceof IMainFragment)
+        {
+            ((IMainFragment) currentFrag).onAccountInfoChanged(mAccountInfo);
+        }
     }
 }

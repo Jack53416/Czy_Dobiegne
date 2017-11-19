@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.szymo.mobileapp.data.AccountInfo;
 import com.example.szymo.mobileapp.data.DistanceData;
 import com.example.szymo.mobileapp.data.DistanceMatrixData;
 import com.example.szymo.mobileapp.data.WCData;
@@ -102,8 +103,10 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
         serverComunication = ((ActivityMain) getActivity()).mServerComunication;
         googleComunication=((ActivityMain)getActivity()).mgoogleComunication;
         serverComunication.send(ServerComunication.RequestType.MARKER, new OnServerDataResponseReceived());
+
         setLocation();
         mMapView.getMapAsync(this);
+
         return inflated;
     }
 
@@ -249,6 +252,7 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
                     Toast.makeText(getContext(),"Nie można obliczyć dystansu do celu",Toast.LENGTH_LONG).show();
                 }
             }
+
             mProgressBar.setVisibility(View.GONE);
         }
     }
