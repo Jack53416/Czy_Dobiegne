@@ -11,11 +11,13 @@ import com.example.szymo.mobileapp.R;
 import com.example.szymo.mobileapp.util.StringUtil;
 
 import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -37,8 +39,9 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class ServerComunication  implements HostnameVerifier {
 
-    public Context ctx;
-
+    private Context ctx;
+    private String serverUrl="https://35.165.124.185";
+    private String clientToken;
     public ServerComunication(Context baseContext) {
         ctx = baseContext;
         setSSLceritfication();
@@ -50,17 +53,22 @@ public class ServerComunication  implements HostnameVerifier {
     }
 
     public enum RequestType{
+        LOGIN,
         MARKER
     }
     public interface IOnResponseReceived {
         void OnResponseReceived(final int code, final String data);
     }
-    public boolean send(@NonNull final RequestType type,final IOnResponseReceived callback){
+    public void setToken(String token){
+        clientToken=token;
+    }
+    public boolean send(@NonNull final RequestType type,final IOnResponseReceived callback,String...var){
        switch (type){
            case MARKER:
-               new RequestDataFromServer().execute(new ServerRequestData(type,callback));
+               new RequestDataFromServer().execute(new ServerRequestData(type,callback,var));
                return true;
-
+           case LOGIN:
+               new RequestPostFromServer().execute(new ServerRequestData(type,callback));
        }
        return false;
     }
@@ -75,7 +83,19 @@ public class ServerComunication  implements HostnameVerifier {
         c.setConnectTimeout(ctx.getResources().getInteger(R.integer.timeout_medium));
         c.setReadTimeout(ctx.getResources().getInteger(R.integer.timeout_medium));
         return c;
+    }
 
+    @NonNull
+    private HttpURLConnection createConnectionurlcoded(final String url, final String method) throws IOException {
+
+        HttpsURLConnection c = (HttpsURLConnection) new URL(url).openConnection();
+        c.setRequestMethod(method);
+        c.setRequestProperty("Accept","application/json");
+        c.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        c.setRequestProperty("charset", "utf-8");
+        c.setConnectTimeout(ctx.getResources().getInteger(R.integer.timeout_medium));
+        c.setReadTimeout(ctx.getResources().getInteger(R.integer.timeout_medium));
+        return c;
     }
     private ServerRequestData handleServerResponse(final ServerRequestData data, final HttpsURLConnection c) throws IOException {
         int responseCode = c.getResponseCode();
@@ -110,20 +130,26 @@ public class ServerComunication  implements HostnameVerifier {
             this.code = code;
         }
     }
-    private class RequestDataFromServer extends AsyncTask<ServerRequestData,Void,ServerRequestData>{
-        private RequestDataFromServer(){}
-
+    private class RequestPostFromServer extends AsyncTask<ServerRequestData,Void,ServerRequestData>{
+        private  RequestPostFromServer(){}
         @Override
         protected ServerRequestData doInBackground(ServerRequestData... serverRequestData) {
             final ServerRequestData data = serverRequestData[0];
             try{
-            String serverUrl="https://35.165.124.185";
-            String url=requestUrl(serverUrl,data.mType);
-            HttpsURLConnection c = (HttpsURLConnection) createConnection(url, "GET");
-            return handleServerResponse(data, c);
-        } catch (Exception e) {
-            Log.e(String.valueOf(this), "exception during sending command to ESH", e);
-        }
+
+                String login_pasword="username=admin&password=dupa34";
+                byte[]postData=login_pasword.getBytes();
+                String url=requestUrl(serverUrl,data.mType);
+                HttpsURLConnection c = (HttpsURLConnection) createConnectionurlcoded(url, "POST");
+                DataOutputStream out = new DataOutputStream(
+                        c.getOutputStream());
+                out.write(postData);
+                out.flush();
+                out.close();
+                return handleServerResponse(data, c);
+            } catch (Exception e) {
+                Log.e(String.valueOf(this), "exception during sending command to ESH", e);
+            }
             return data;
         }
         @Override
@@ -137,11 +163,48 @@ public class ServerComunication  implements HostnameVerifier {
             switch (type){
                 default:
                     return  null;
-                case MARKER:
-                    resId= R.string.HelloWorld;
+                case LOGIN:
+                    resId= R.string.signin;
                     break;
             }
             return ctx.getString(resId,BaseUrl);
+        }
+    }
+    private class RequestDataFromServer extends AsyncTask<ServerRequestData,Void,ServerRequestData>{
+        private RequestDataFromServer(){}
+
+        @Override
+        protected ServerRequestData doInBackground(ServerRequestData... serverRequestData) {
+            final ServerRequestData data = serverRequestData[0];
+            try{
+            String url=requestUrl(serverUrl,data.mType,data.mUrlVariables);
+            HttpsURLConnection c = (HttpsURLConnection) createConnection(url, "GET");
+            if(clientToken!=null){
+            c.setRequestProperty("x-access-token",clientToken);
+            }
+            return handleServerResponse(data, c);
+        } catch (Exception e) {
+            Log.e(String.valueOf(this), "exception during sending command to ESH", e);
+        }
+            return data;
+        }
+        @Override
+        protected void onPostExecute(final ServerRequestData data) {
+            if (data != null && data.mCallback != null) {
+                data.mCallback.OnResponseReceived(data.getCode(), data.mData);
+            }
+        }
+        private String requestUrl(final String BaseUrl,final RequestType type,String ...var){
+            final int resId;
+            switch (type){
+                default:
+                    return  null;
+                case MARKER:
+                    resId= R.string.queryPosition;
+                    return  ctx.getString(resId,BaseUrl,"%3E%3D"+var[0],"%3C%3D"+var[1],"%3E%3D"+var[2],"%3C%3D"+var[3]);
+
+            }
+
         }
     }
 

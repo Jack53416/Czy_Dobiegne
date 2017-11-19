@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
@@ -13,23 +14,33 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.example.szymo.mobileapp.data.AccountInfo;
 import com.example.szymo.mobileapp.net.ServerComunication;
+import com.example.szymo.mobileapp.util.SharedPrefs;
 
 /**
  * Created by szymo on 25.10.2017.
  */
 
-public abstract class FragmentBase extends android.support.v4.app.Fragment {
+public abstract class FragmentBase extends android.support.v4.app.Fragment implements IMainFragment {
 
 
     protected View mNoDataFrame;
-
+    private AccountInfo mAccountInfo;
+    protected SharedPrefs mPrefs;
     @Nullable
     @Override
     public final View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState)
     {
         final View v = createView(inflater, container, savedInstanceState);
         return v;
+    }
+
+    @Override
+    public void onAttach(final Context context)
+    {
+        super.onAttach(context);
+        mPrefs = new SharedPrefs(context);
     }
 
     @Override
@@ -115,5 +126,19 @@ public abstract class FragmentBase extends android.support.v4.app.Fragment {
             final InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(token, InputMethodManager.HIDE_NOT_ALWAYS);
         }
+    }
+
+    @Override
+    public void onAccountInfoChanged(AccountInfo info) {
+        mAccountInfo = info;
+    }
+    @NonNull
+    protected AccountInfo getAccountInfo()
+    {
+        if (mAccountInfo != null)
+        {
+            return mAccountInfo;
+        }
+        return mAccountInfo = new AccountInfo(mPrefs);
     }
 }

@@ -8,14 +8,25 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.szymo.mobileapp.data.AccountInfo;
+import com.example.szymo.mobileapp.data.DistanceData;
+import com.example.szymo.mobileapp.data.DistanceMatrixData;
 import com.example.szymo.mobileapp.data.WCData;
+import com.example.szymo.mobileapp.net.GoogleComunication;
 import com.example.szymo.mobileapp.net.ServerComunication;
+import com.example.szymo.mobileapp.parser.DistanceMatrixParser;
 import com.example.szymo.mobileapp.parser.WcParser;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,11 +35,14 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.nearby.messages.Distance;
 
 import org.json.JSONException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 //import android.location.Location;
@@ -39,7 +53,7 @@ import java.util.List;
  */
 
 public class FragmentMain extends FragmentBase implements OnMapReadyCallback, LocationListener {
-
+    private final Handler mHandler = new Handler();
     private View mProgressBar;
     private MapView mMapView;
     private GoogleMap mMap;
@@ -48,7 +62,20 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
     private Marker myPosition;
     ServerComunication serverComunication;
     CameraUpdate zoom;
-
+    ImageButton zoom_in;
+    ImageButton zoom_out;
+    ImageButton centerlocalization;
+    LinearLayout information;
+    ImageView create_down;
+    TextView time;
+    TextView distance;
+    private int zoom_value = 15;
+    GoogleComunication googleComunication;
+float SWLat=0;
+float SWLot=0;
+float NELat=0;
+float NELot=0;
+boolean flag=true;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -63,7 +90,17 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
         mProgressBar = inflated.findViewById(R.id.progress);
         mMapView = (MapView) inflated.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
-
+        zoom_in = (ImageButton) inflated.findViewById(R.id.zoom_in);
+        zoom_in.setOnClickListener(zoomIn);
+        zoom_out = (ImageButton) inflated.findViewById(R.id.zoom_out);
+        zoom_out.setOnClickListener(zoomOut);
+        centerlocalization = (ImageButton) inflated.findViewById(R.id.center_localization);
+        centerlocalization.setOnClickListener(cetrumSet);
+        create_down = (ImageView) inflated.findViewById(R.id.carete_down);
+        create_down.setOnClickListener(information_gone);
+        time = (TextView) inflated.findViewById(R.id.text_time);
+        distance = (TextView) inflated.findViewById(R.id.text_distance);
+        information = (LinearLayout) inflated.findViewById(R.id.information);
         mMapView.onResume();
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -71,9 +108,12 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
             Log.e("Problem with map :", e.toString());
         }
         serverComunication = ((ActivityMain) getActivity()).mServerComunication;
-        serverComunication.send(ServerComunication.RequestType.MARKER, new OnServerDataResponseReceived());
+        googleComunication = ((ActivityMain) getActivity()).mgoogleComunication;
+
+
         setLocation();
         mMapView.getMapAsync(this);
+
         return inflated;
     }
 
@@ -91,6 +131,10 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
+        mMap.setOnMarkerClickListener(markerClickListener);
         if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ((ActivityMain) getActivity()).goToPermissionActivity();
         }
@@ -99,29 +143,78 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
             Log.i(mMap.getMyLocation().toString(), "");
         }
 
+        mMap.setOnCameraMoveListener(listener);
+        mMap.setOnCameraMoveCanceledListener(listenerCanceled);
 
     }
+
+    GoogleMap.OnCameraMoveCanceledListener listenerCanceled = new GoogleMap.OnCameraMoveCanceledListener() {
+        @Override
+        public void onCameraMoveCanceled() {
+            serverComunication.send(ServerComunication.RequestType.MARKER, new OnServerDataResponseReceived(),String.valueOf(SWLat-0.5),String.valueOf(NELat+0.5)
+                    ,String.valueOf(SWLot-0.5),String.valueOf(NELot+0.5));
+        }
+    };
+    GoogleMap.OnCameraMoveListener listener = new GoogleMap.OnCameraMoveListener() {
+        @Override
+        public void onCameraMove() {
+            LatLngBounds curScreen = mMap.getProjection().getVisibleRegion().latLngBounds;
+            float test=mMap.getCameraPosition().zoom;
+            if (test== zoom_value&& flag) {
+                flag=false;
+                SWLat= round((float) curScreen.southwest.latitude);
+                SWLot= round((float) curScreen.southwest.longitude);
+                NELat= round((float)curScreen.northeast.latitude);
+                NELot= round((float)curScreen.northeast.longitude);
+                mMap.stopAnimation();
+            }
+            if(parametersTest()){
+                if( (SWLot!= round((float) curScreen.southwest.longitude)&& NELot!= round((float)curScreen.northeast.longitude))||
+                        (SWLat!=round((float) curScreen.southwest.latitude)&&NELat!= round((float)curScreen.northeast.latitude))){
+                    SWLat= round((float) curScreen.southwest.latitude);
+                    SWLot= round((float) curScreen.southwest.longitude);
+                    NELat= round((float)curScreen.northeast.latitude);
+                    NELot= round((float)curScreen.northeast.longitude);
+                    mMap.stopAnimation();
+                }
+            }
+
+        }
+    };
+    public static float round(float d) {
+        BigDecimal bd = new BigDecimal(Float.toString(d));
+        bd = bd.setScale(1, BigDecimal.ROUND_HALF_UP);
+        return bd.floatValue();
+    }
+    private boolean parametersTest(){
+        if(SWLat!=0&&SWLot!=0&&NELat!=0&&NELot!=0){
+            return true;
+        }
+        return false;
+    }
+    GoogleMap.OnMarkerClickListener markerClickListener = new GoogleMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            if (marker != null) {
+                LatLng latLng = marker.getPosition();
+                DistanceData distanceData = new DistanceData(mLocation.getLatitude(), mLocation.getLongitude(), latLng.latitude, latLng.longitude);
+                googleComunication.send(GoogleComunication.RequestType.DISTANSE, new OnGoogleDataResponseReceived(), distanceData);
+                mProgressBar.setVisibility(View.VISIBLE);
+                return true;
+            }
+            return false;
+        }
+    };
 
     private void setLocalizationOnMap() {
         if (mLocation != null) {
             LatLng position = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
             if (zoom == null) {
-                zoom = CameraUpdateFactory.newLatLngZoom(position, 15);
+                zoom = CameraUpdateFactory.newLatLngZoom(position, zoom_value);
                 mMap.animateCamera(zoom);
+
             }
             mProgressBar.setVisibility(View.GONE);
-
-//            Geocoder geocoder=new Geocoder(getContext());
-//            List<Address> addresses;
-//            try {
-//                addresses=geocoder.getFromLocationName("Dobroń, kaczeńcowa 1",1);
-//                if(addresses.size() > 0){
-//
-//                    mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(0).getLatitude(),addresses.get(0).getLongitude()))).setTitle("test");
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
         }
     }
 
@@ -158,6 +251,7 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
     @Override
     public void onLocationChanged(Location location) {
         mLocation = location;
+
         setLocalizationOnMap();
     }
 
@@ -182,7 +276,6 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
             if (data != null) {
                 try {
                     List<WCData> listWC = new WcParser().parser(data);
-
                     if (listWC != null) {
                         for (int i = 0; i < listWC.size(); i++) {
                             mMap.addMarker(new MarkerOptions().position(new LatLng(listWC.get(i).Latitude, listWC.get(i).Longitude))).setTitle(listWC.get(i).name);
@@ -195,4 +288,52 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
 
         }
     }
+
+    private class OnGoogleDataResponseReceived implements GoogleComunication.IOnResponseReceived {
+        @Override
+        public void OnResponseReceived(final int code, final String data) {
+            if (data != null) {
+
+                DistanceMatrixData distanceMatrixData = new DistanceMatrixParser().parser(data);
+                if (distanceMatrixData != null) {
+                    time.setText(distanceMatrixData.Time);
+                    distance.setText(distanceMatrixData.Distance);
+                    information.setVisibility(View.VISIBLE);
+                } else {
+                    information.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Nie można obliczyć dystansu do celu", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            mProgressBar.setVisibility(View.GONE);
+        }
+    }
+
+    View.OnClickListener zoomIn = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            mMap.animateCamera(CameraUpdateFactory.zoomIn());
+        }
+    };
+
+    View.OnClickListener zoomOut = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            mMap.animateCamera(CameraUpdateFactory.zoomOut());
+        }
+    };
+    View.OnClickListener cetrumSet = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            LatLng latLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom_value);
+            mMap.animateCamera(cameraUpdate);
+        }
+    };
+    View.OnClickListener information_gone = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            information.setVisibility(View.GONE);
+        }
+    };
 }
