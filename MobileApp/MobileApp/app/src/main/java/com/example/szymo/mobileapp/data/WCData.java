@@ -8,4 +8,5 @@ public class WCData {
     public double  Longitude;
     public double Latitude;
     public String name;
+    public int count;
 }

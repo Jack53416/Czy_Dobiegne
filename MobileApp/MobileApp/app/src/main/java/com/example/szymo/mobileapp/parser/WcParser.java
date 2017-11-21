@@ -28,4 +28,12 @@ public class WcParser {
         }
         return response;
     }
+    public List<Integer> parserCount(final String data)throws JSONException{
+        List<Integer>list=new ArrayList<>();
+        final OLPJsonParser p=new OLPJsonParser();
+        final OLPJsonParser.OLPJsonContext ctx=p.parse(data);
+        list.add(new Integer(ctx.value("count").toString()));
+        list.add(new Integer(ctx.value("offset").toString()));
+        return list;
+    }
 }

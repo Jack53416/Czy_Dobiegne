@@ -201,7 +201,7 @@ public class ServerComunication  implements HostnameVerifier {
                     return  null;
                 case MARKER:
                     resId= R.string.queryPosition;
-                    return  ctx.getString(resId,BaseUrl,"%3E%3D"+var[0],"%3C%3D"+var[1],"%3E%3D"+var[2],"%3C%3D"+var[3]);
+                    return  ctx.getString(resId,BaseUrl,"%3E%3D"+var[0],"%3C%3D"+var[1],"%3E%3D"+var[2],"%3C%3D"+var[3],var[4]);
 
             }
 

@@ -75,7 +75,7 @@ public class GoogleComunication implements HostnameVerifier {
         data.setCode(responseCode);
         if (responseCode == 200) {
             data.mData = StringUtil.StreamToString(c.getInputStream());
-            Log.v(String.valueOf(this), "Response OK: " + data.mData);
+            Log.v(String.valueOf(this), "Response OK: "+responseCode);
             return data;
         } else {
             Log.d(String.valueOf(this), "Response code: " + responseCode);
