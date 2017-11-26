@@ -3,6 +3,7 @@ package com.example.szymo.mobileapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -39,6 +40,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.nearby.messages.Distance;
 
 import org.json.JSONException;
@@ -77,6 +80,7 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
     float NELat = 0;
     float NELot = 0;
     boolean flag = true;
+    private Polyline polyline;
 
     @Override
     public void onAttach(Activity activity) {
@@ -287,6 +291,7 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
                     time.setText(distanceMatrixData.Time);
                     distance.setText(distanceMatrixData.Distance);
                     information.setVisibility(View.VISIBLE);
+                    drawTruck(distanceMatrixData.pointons);
                 } else {
                     information.setVisibility(View.GONE);
                     Toast.makeText(getContext(), "Nie można obliczyć dystansu do celu", Toast.LENGTH_LONG).show();
@@ -295,6 +300,20 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
 
             mProgressBar.setVisibility(View.GONE);
         }
+    }
+
+    private void drawTruck(List<LatLng> positions){
+        PolylineOptions polylineOptions=new PolylineOptions();
+        polylineOptions.addAll(positions);
+        polylineOptions.width(20);
+        polylineOptions.color(Color.RED);
+        polylineOptions.geodesic(true);
+    if(polyline!=null){
+        polyline.remove();
+    }
+
+        polyline=mMap.addPolyline(polylineOptions);
+
     }
 
     View.OnClickListener zoomIn = new View.OnClickListener() {

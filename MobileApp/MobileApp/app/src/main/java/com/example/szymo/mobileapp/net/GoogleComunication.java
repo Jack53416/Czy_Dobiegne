@@ -53,7 +53,8 @@ public class GoogleComunication implements HostnameVerifier {
     }
 
     public enum RequestType {
-        DISTANSE
+        DISTANSE,
+        RUTE
     }
 
     public interface IOnResponseReceived {
@@ -139,7 +140,8 @@ public class GoogleComunication implements HostnameVerifier {
                     return null;
                 case DISTANSE:
                     resId = R.string.GoooleDistance;
-                    return ctx.getString(resId, var[0], var[1], var[2].toString()+"%2C", var[3].toString()+"%7C");
+                    return ctx.getString(resId, var[0], var[1], var[2], var[3]);
+
             }
 
         }
