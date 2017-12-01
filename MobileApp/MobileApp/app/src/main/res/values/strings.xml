@@ -10,6 +10,10 @@
     <string name="distance">Dystans :</string>
     <string name="time">Czas :</string>
 
+    <!--Menu-->
+    <string name="map">Mapa</string>
+    <string name="user">Użytkownik</string>
+    <!--Menu-->
 
     <string name="queryPosition">%1$s/api/query/locations?latitude=%2$s,%3$s&amp;longitude=%4$s,%5$s&amp;offset=%6$s&amp;fields=*</string>
     <string name="signin">%1$s/api/auth</string>

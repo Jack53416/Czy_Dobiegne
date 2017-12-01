@@ -66,7 +66,7 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         }
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
-        mNavigationView.setCheckedItem(R.id.nav_main);
+        mNavigationView.setCheckedItem(R.id.nav_map);
         mProgress = findViewById(R.id.progress);
         mProgress.setVisibility(View.GONE);
 
@@ -139,6 +139,23 @@ public class ActivityMain extends ActivityBase implements IActivityAccess,Naviga
         final int id = item.getItemId();
 
         mFakeCAB.reset();
+
+        if(id==R.id.nav_map){
+            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            final FragmentMain frag = new FragmentMain();
+            ft.replace(R.id.main_content, frag);
+            ft.commit();
+        }else if(id==R.id.nav_user)
+        {
+            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            final FragmentUser frag = new FragmentUser();
+            ft.replace(R.id.main_content, frag);
+            ft.commit();
+        }
+        if (mDrawerLayout != null)
+        {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
         return true;
     }
     public void goToPermissionActivity()

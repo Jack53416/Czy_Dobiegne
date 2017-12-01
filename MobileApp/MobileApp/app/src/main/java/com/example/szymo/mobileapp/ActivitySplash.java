@@ -26,7 +26,7 @@ public class ActivitySplash extends ActivityBase {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
+//        Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.activity_splash);
 
