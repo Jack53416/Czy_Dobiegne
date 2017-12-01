@@ -15,11 +15,17 @@ var createRoutes = function (app) {
      console.log("handler: " + route);
      app.use(pth, handler);
    }
+   app.use(ErrorHandlerGeneric);
 
    app.get('*', function (req, res) {
        res.send("Invalid URL");
    });
 
  };
+
+
+function ErrorHandlerGeneric(err, req, res, nex){
+   res.status(500).json({"success":false, message:err.message});
+ }
 
 module.exports = createRoutes;
