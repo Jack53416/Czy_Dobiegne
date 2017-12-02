@@ -3,6 +3,7 @@ var fs = require("fs");
 var crypto = require('crypto');
 var path = require('path');
 var assert = require('assert');
+var validator = require('validator');
 
 const readDirectorySync = (dir, usrFilter) =>
  fs.readdirSync(dir)
@@ -68,7 +69,7 @@ function validateStandardQuery(query){
   }
 
   if(query.hasOwnProperty('offset')){
-    assert.ok(validator.isInt(query.offset), 'offset is invalid');
+    assert.ok(validator.isInt(query.offset, {"min":0}), 'offset is invalid');
     offset = parseInt(query.offset);
   }
   return {count: count, offset: offset, fields : fields};
