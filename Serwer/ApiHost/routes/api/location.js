@@ -10,7 +10,7 @@ var helpers = require('../../helpers.js');
 var authorize = require('../../authorize.js');
 var database = require('../../database.js');
 
-//router.use(authorize.verifyToken);
+router.use(authorize.verifyToken);
 
 /**
  * @swagger
@@ -97,12 +97,9 @@ var database = require('../../database.js');
  *
  */
 router.post('/', function(req, res, next){
-    assert.ok(req.body.hasOwnProperty('country'), "coutry field required!");
-    assert.ok(req.body.hasOwnProperty('city'), "city field reqired");
-    assert.ok(req.body.hasOwnProperty('street'), "street field required");
-    assert.ok(req.body.hasOwnProperty('longitude'), "longitude field required");
-    assert.ok(req.body.hasOwnProperty('latitude'), 'latitude field required');
-
+    checkForRequestParams(['country', 'city', 'street', 'longitude', 'latitude'], req.body);
+    assert.ok(validator.isDecimal(req.body.longitude), 'longitude is not a number');
+    assert.ok(validator.isDecimal(req.body.latitude), 'latitude is not a number');
     var location = new database.Location(
       req.body.country,
       req.body.city,
@@ -114,11 +111,11 @@ router.post('/', function(req, res, next){
       location.name = req.body.name;
     }
     if(req.body.hasOwnProperty('price_min')){
-      assert(validator.isInt(req.body.price_min, {min :0}), "Invalid price_min!");
+      assert(validator.isDecimal(req.body.price_min, {min :0}), "Invalid price_min!");
       location.price_min = req.body.price_min;
     }
     if(req.body.hasOwnProperty('price_max')){
-      assert(validator.isInt(req.body.price_max, {min :0}), "Invalid price_max!");
+      assert(validator.isDecimal(req.body.price_max, {min :0}), "Invalid price_max!");
       location.price_max = req.body.price_max;
     }
     if(req.body.hasOwnProperty('description')){
@@ -226,11 +223,18 @@ router.post('/', function(req, res, next){
 
 router.put('/:id', function(req, res, next){
     var id = req.params.id;
+    next();
 /*    var queryOptions = new database.QueryOptions(1 , 0, '*', 'TOILETS.ID=?', [id]);
     database.getLocations(queryOptions, res, next);*/
 },
   function(req, res){
-
+    res.json({success: true, message: 'Toilet with id: ' + req.params.id + ' updated sucessfully'});
 });
+
+function checkForRequestParams(requiredParams, body){
+  for(param of requiredParams){
+      assert.ok(body.hasOwnProperty(param), param + " field required!");
+  }
+}
 
 module.exports = router;

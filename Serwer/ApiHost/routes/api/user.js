@@ -18,6 +18,7 @@ router.use(authorize.verifyToken);
  *   post:
  *     security:
  *       - userAuthorization: []
+ *       - apiClientAuthorization: []
  *     tags:
  *       - User
  *     description: Adds a new user
