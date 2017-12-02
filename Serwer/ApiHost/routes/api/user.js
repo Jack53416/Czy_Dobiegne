@@ -4,6 +4,8 @@ var express = require('express');
 var router  = express.Router();
 
 var assert = require('assert');
+var validator = require('validator');
+
 var helpers = require('../../helpers.js');
 var authorize = require('../../authorize.js');
 var database = require('../../database.js');
@@ -74,7 +76,7 @@ router.post('/', function(req, res, next){
  *       - bearerAuth: []
  *     tags:
  *       - User
- *     description: Modifies existing user. In case field doesn't need to be changed send old data
+ *     description: Modifies existing user. In order to change data at least one parameter is required. To modify only password send password param, to modify all, send all of them.
  *     consumes:
  *       - application/x-www-form-urlencoded
  *     produces:
@@ -83,20 +85,20 @@ router.post('/', function(req, res, next){
  *       - name: username
  *         description: new username for the current user
  *         in: formData
- *         required: true
+ *         required: false
  *         type: string
  *
  *       - name: email
  *         description: new name for a current user
  *         in: formData
- *         required: true
+ *         required: false
  *         type: string
  *         format: email
  *
  *       - name: password
  *         description: new password for current user
  *         in: formData
- *         required: true
+ *         required: false
  *         type: string
  *         format: password
  *     responses:
@@ -112,11 +114,33 @@ router.post('/', function(req, res, next){
  *
  */
 router.put('/', function(req, res, next){
-  validateUserRequestData(req);
-  var modifiedUserData = new database.UserData(req.body.username, req.body.email, req.body.password);
-  database.updateUser(modifiedUserData, req.decoded.userID, next);
+  assert.notEqual(req.decoded.permissions, 'admin', "Cannot change admin's user data!");
+  database.findUserById(req.decoded.userId, res, next);
+},
+  function(req, res, next){
+    var oldUserData = res.locals.userData;
+    console.log("Old user data");
+    console.log(oldUserData);
+    var modifiedUserData = new database.UserData(oldUserData.username, oldUserData.email);
+    modifiedUserData.passwordEncrypted = oldUserData.password;
 
-}, function(req, res){
+    if(req.body.hasOwnProperty('username')){
+      assert.ok(validator.isLength(req.body.username, {"min": 6, "max": 40}), "Username should be between 6 and 40 characters");
+      modifiedUserData.username = req.body.username;
+    }
+    if(req.body.hasOwnProperty('email')){
+      assert.ok(validator.isEmail(req.body.email), "Ivalid email provided");
+      modifiedUserData.email = req.body.email;
+    }
+    if(req.body.hasOwnProperty('password')){
+      assert.ok(validator.isLength(req.body.password, {"min":6, "max":100}), "Password should be between 6 and 100 characters");
+      modifiedUserData.password = req.body.password;
+      modifiedUserData.encryptPassword();
+    }
+
+    database.updateUser(modifiedUserData, oldUserData.id, next);
+},
+ function(req, res){
    res.json({"sucess": true, "message": "Data updated successfully"});
 });
 
