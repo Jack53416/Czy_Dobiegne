@@ -3,6 +3,7 @@ package com.example.szymo.mobileapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -34,10 +35,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.nearby.messages.Distance;
 
 import org.json.JSONException;
@@ -71,11 +75,13 @@ public class FragmentMain extends FragmentBase implements OnMapReadyCallback, Lo
     TextView distance;
     private int zoom_value = 15;
     GoogleComunication googleComunication;
-float SWLat=0;
-float SWLot=0;
-float NELat=0;
-float NELot=0;
-boolean flag=true;
+    float SWLat = 0;
+    float SWLot = 0;
+    float NELat = 0;
+    float NELot = 0;
+    boolean flag = true;
+    private Polyline polyline;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -142,60 +148,41 @@ boolean flag=true;
         if (mMap.getMyLocation() != null) {
             Log.i(mMap.getMyLocation().toString(), "");
         }
+        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                LatLngBounds curScreen = mMap.getProjection().getVisibleRegion().latLngBounds;
 
-        mMap.setOnCameraMoveListener(listener);
-        mMap.setOnCameraMoveCanceledListener(listenerCanceled);
+                if ((SWLot != round((float) curScreen.southwest.longitude) && NELot != round((float) curScreen.northeast.longitude)) ||
+                        (SWLat != round((float) curScreen.southwest.latitude) && NELat != round((float) curScreen.northeast.latitude))) {
+                    SWLat = round((float) curScreen.southwest.latitude);
+                    SWLot = round((float) curScreen.southwest.longitude);
+                    NELat = round((float) curScreen.northeast.latitude);
+                    NELot = round((float) curScreen.northeast.longitude);
+                    mMap.stopAnimation();
+                    serverComunication.send(ServerComunication.RequestType.MARKER, new OnServerDataResponseReceived(), String.valueOf(SWLat - 0.5), String.valueOf(NELat + 0.5)
+                            , String.valueOf(SWLot - 0.5), String.valueOf(NELot + 0.5), "0");
+
+                }
+            }
+        });
+
 
     }
 
-    GoogleMap.OnCameraMoveCanceledListener listenerCanceled = new GoogleMap.OnCameraMoveCanceledListener() {
-        @Override
-        public void onCameraMoveCanceled() {
-            serverComunication.send(ServerComunication.RequestType.MARKER, new OnServerDataResponseReceived(),String.valueOf(SWLat-0.5),String.valueOf(NELat+0.5)
-                    ,String.valueOf(SWLot-0.5),String.valueOf(NELot+0.5));
-        }
-    };
-    GoogleMap.OnCameraMoveListener listener = new GoogleMap.OnCameraMoveListener() {
-        @Override
-        public void onCameraMove() {
-            LatLngBounds curScreen = mMap.getProjection().getVisibleRegion().latLngBounds;
-            float test=mMap.getCameraPosition().zoom;
-            if (test== zoom_value&& flag) {
-                flag=false;
-                SWLat= round((float) curScreen.southwest.latitude);
-                SWLot= round((float) curScreen.southwest.longitude);
-                NELat= round((float)curScreen.northeast.latitude);
-                NELot= round((float)curScreen.northeast.longitude);
-                mMap.stopAnimation();
-            }
-            if(parametersTest()){
-                if( (SWLot!= round((float) curScreen.southwest.longitude)&& NELot!= round((float)curScreen.northeast.longitude))||
-                        (SWLat!=round((float) curScreen.southwest.latitude)&&NELat!= round((float)curScreen.northeast.latitude))){
-                    SWLat= round((float) curScreen.southwest.latitude);
-                    SWLot= round((float) curScreen.southwest.longitude);
-                    NELat= round((float)curScreen.northeast.latitude);
-                    NELot= round((float)curScreen.northeast.longitude);
-                    mMap.stopAnimation();
-                }
-            }
-
-        }
-    };
     public static float round(float d) {
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(1, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
     }
-    private boolean parametersTest(){
-        if(SWLat!=0&&SWLot!=0&&NELat!=0&&NELot!=0){
-            return true;
-        }
-        return false;
-    }
+
+
+
     GoogleMap.OnMarkerClickListener markerClickListener = new GoogleMap.OnMarkerClickListener() {
         @Override
         public boolean onMarkerClick(Marker marker) {
             if (marker != null) {
+                marker.showInfoWindow();
                 LatLng latLng = marker.getPosition();
                 DistanceData distanceData = new DistanceData(mLocation.getLatitude(), mLocation.getLongitude(), latLng.latitude, latLng.longitude);
                 googleComunication.send(GoogleComunication.RequestType.DISTANSE, new OnGoogleDataResponseReceived(), distanceData);
@@ -275,10 +262,15 @@ boolean flag=true;
         public void OnResponseReceived(final int code, final String data) {
             if (data != null) {
                 try {
+                    List<Integer> counter = new WcParser().parserCount(data);
+                    if (counter.get(0) == 200) {
+                        serverComunication.send(ServerComunication.RequestType.MARKER, new OnServerDataResponseReceived(), String.valueOf(SWLat - 0.5), String.valueOf(NELat + 0.5)
+                                , String.valueOf(SWLot - 0.5), String.valueOf(NELot + 0.5), String.valueOf(counter.get(0) + counter.get(1)));
+                    }
                     List<WCData> listWC = new WcParser().parser(data);
                     if (listWC != null) {
                         for (int i = 0; i < listWC.size(); i++) {
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(listWC.get(i).Latitude, listWC.get(i).Longitude))).setTitle(listWC.get(i).name);
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(listWC.get(i).Latitude, listWC.get(i).Longitude)).title(listWC.get(i).name));
                         }
                     }
                 } catch (JSONException e) {
@@ -299,6 +291,7 @@ boolean flag=true;
                     time.setText(distanceMatrixData.Time);
                     distance.setText(distanceMatrixData.Distance);
                     information.setVisibility(View.VISIBLE);
+                    drawTruck(distanceMatrixData.pointons);
                 } else {
                     information.setVisibility(View.GONE);
                     Toast.makeText(getContext(), "Nie można obliczyć dystansu do celu", Toast.LENGTH_LONG).show();
@@ -309,10 +302,25 @@ boolean flag=true;
         }
     }
 
+    private void drawTruck(List<LatLng> positions){
+        PolylineOptions polylineOptions=new PolylineOptions();
+        polylineOptions.addAll(positions);
+        polylineOptions.width(20);
+        polylineOptions.color(Color.RED);
+        polylineOptions.geodesic(true);
+    if(polyline!=null){
+        polyline.remove();
+    }
+
+        polyline=mMap.addPolyline(polylineOptions);
+
+    }
+
     View.OnClickListener zoomIn = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
+
         }
     };
 

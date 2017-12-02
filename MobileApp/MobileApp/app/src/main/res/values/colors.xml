@@ -6,4 +6,6 @@
     <color name="colorbackground">#000000</color>
     <color name="colormenu">#000000</color>
     <color name="importantcolor">#0000bf</color>
+    <color name="red">#F00000</color>
+    <item name="white" type="color">#FFFFFF</item>
 </resources>
