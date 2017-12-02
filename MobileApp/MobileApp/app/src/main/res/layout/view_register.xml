@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/main_activity_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center|top"
+    android:background="@color/colorbackground"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_marginTop="10dp"
+            android:id="@+id/login_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_add_people"/>
+
+
+        <FrameLayout
+            android:id="@+id/login_input_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/login_logo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="44dp">
+
+            <EditText
+                android:id="@+id/login_input"
+                style="@style/EditTextLogin"
+                android:hint="@string/login_hint"
+                android:singleLine="true"/>
+
+            <ImageView
+                android:id="@+id/login_input_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/ic_cancel"
+                android:visibility="gone"/>
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/email_input_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/login_input_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp">
+
+            <EditText
+                android:id="@+id/email_input"
+                style="@style/EditTextLogin"
+                android:hint="@string/email_hint"
+                android:imeOptions="actionGo"
+                android:singleLine="true"/>
+
+            <ImageView
+                android:id="@+id/email_input_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/ic_cancel"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/password_input_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/email_input_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp">
+
+            <EditText
+                android:id="@+id/password_input"
+                style="@style/EditTextLogin"
+                android:hint="@string/password_hint"
+                android:imeActionLabel="@string/login_ime_action"
+                android:imeOptions="actionGo"
+                android:inputType="textPassword"
+                android:singleLine="true"/>
+
+            <ImageView
+                android:id="@+id/password_input_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/ic_cancel"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/password_input_layout_again"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/password_input_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp">
+
+            <EditText
+                android:id="@+id/password_input_again"
+                style="@style/EditTextLogin"
+                android:hint="@string/password_hint_again"
+                android:imeActionLabel="@string/login_ime_action"
+                android:imeOptions="actionGo"
+                android:inputType="textPassword"
+                android:singleLine="true"/>
+
+            <ImageView
+                android:id="@+id/password_input_clear_again"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/ic_cancel"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+        <Button
+            android:id="@+id/login_button"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@id/password_input_layout"
+            android:layout_below="@id/password_input_layout_again"
+            android:layout_marginTop="32dp"
+            android:text="@string/login_button"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+
+
+</FrameLayout>

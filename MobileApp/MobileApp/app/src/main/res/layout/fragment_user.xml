@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+   <RelativeLayout
+    android:id="@+id/data_root"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</android.support.constraint.ConstraintLayout>
+<android.support.design.widget.TabLayout
+    android:id="@+id/services_tabs"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:layout_gravity="bottom"
+    android:background="@color/colorPrimary"
+    app:tabMode="fixed"
+    app:tabSelectedTextColor="@color/red"
+    app:tabTextColor="@color/colormenu"/>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/services_pager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/services_tabs"/>
+</RelativeLayout>
