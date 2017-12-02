@@ -63,6 +63,7 @@ UserData.prototype.encryptPassword = function(){
   this.passwordEncrypted =  helpers.hashData('sha256', this.password + this.salt, 'base64');
 }
 
+
 /**
  * Creates new instance of QueryOptions object
  * @param   {Int}      count  specifies max quantity of records(max 200)
@@ -230,18 +231,21 @@ function getLocations(queryOptions, res, next){
 
 
 function addLocation(location, res, next){
+  console.log(location);
   firebird.attach(dbOptions, function(err, db){
     if(err){
       throw err;
     }
     var sqlQuery = "EXECUTE PROCEDURE ADD_TOILET (?,?,?,?,?,?,?,?,?)";
     var sqlQuertParams = [location.name, location.country, location.city, location.street, location.latitude, location.longitude,
-                          location.toilet.price_min, location.toilet.price_max, location.toilet.description];
+                          location.price_min, location.price_max, location.description];
     db.query(sqlQuery, sqlQuertParams, function(err, queryResult){
+      db.detach();
       if(err){
         return next(err);
       }
-      res.locals.queryResultMessage = queryResult[0].message;
+      res.locals.queryResultMessage = queryResult.message;
+      return next();
     });
   });
 }
@@ -254,3 +258,4 @@ exports.findUser = findUser;
 exports.findUserById = findUserById;
 exports.updateUser = updateUser;
 exports.getLocations = getLocations;
+exports.addLocation = addLocation;
