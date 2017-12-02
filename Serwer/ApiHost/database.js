@@ -4,46 +4,6 @@ var firebird = require('node-firebird');
 
 var dbOptions = helpers.readJSONFile('fb-config.json');
 
-const dbSchema = {
-  tableUsers:{
-    tableName: "USERS",
-    columns:{
-      id: "ID",
-      username: "USERNAME",
-      email:"EMAIL",
-      password:"PASSWORD",
-      salt: "SALT",
-      permissions:"PERMISSIONS"
-    }
-  },
-  tableToilets:{
-    tableName: "TOILETS",
-    columns:{
-      id:"ID",
-      id_location: "ID_LOCATION",
-      price_min: "PRICE_MIN",
-      price_max: "PRICE_MAX",
-      description: "DESCRIPTION",
-      rating: "RATING",
-      vote_nr: "VOTE_NR",
-      date_added: "DATE_ADDED",
-      validated: "VALIDATED"
-    }
-  },
-  tableLocations:{
-    tableName: "LOCATIONS",
-    columns: {
-      id: "ID",
-      name: "NAME",
-      country: "COUNTRY",
-      city: "CITY",
-      street: "STREET",
-      longitude: "LONGITUDE",
-      latitude: "LATITUDE"
-    }
-  }
-};
-
 /**
  * Creates new instance of userData object
  * @param  {string} username  username
@@ -61,6 +21,32 @@ function UserData(username, email, password){
 
 UserData.prototype.encryptPassword = function(){
   this.passwordEncrypted =  helpers.hashData('sha256', this.password + this.salt, 'base64');
+}
+
+/**
+ * Creates new instance of location object
+ * @param       {string} country     coutry name, required
+ * @param       {string} city        city name, required
+ * @param       {string} street      full street address, required
+ * @param       {number} longitude   latitude value, required
+ * @param       {number} latitude    longitude value, required
+ * @param       {string} name        name of the location, optional
+ * @param       {number} price_min   minimal price, optional
+ * @param       {number} price_max   maximal price, optional
+ * @param       {string} description location's description, optional
+ * @constructor
+ */
+function Location(country, city, street, longitude, latitude, name, price_min,
+                  price_max, description){
+  this.country = country;
+  this.city = city;
+  this.street = street;
+  this.longitude = longitude;
+  this.latitude = latitude;
+  this.name = typeof name !== 'undefined' ? name : null;
+  this.price_min = typeof price_min !== 'undefined' ? price_max : 0;
+  this.price_max = typeof price_max !== 'undefined' ? price_max : this.price_min;
+  this.description = typeof description !== 'undefined' ? description : null;
 }
 
 
@@ -224,7 +210,12 @@ function getLocations(queryOptions, res, next){
       if(err){
         return next(err);
       }
-      res.json({"count": queryResult.length , "offset": queryOptions.offset, "data": queryResult});
+      res.locals.queryResult = {
+        "count": queryResult.length ,
+        "offset": queryOptions.offset,
+        "data": queryResult
+      };
+      return next();
     });
   });
 }
@@ -244,7 +235,7 @@ function addLocation(location, res, next){
       if(err){
         return next(err);
       }
-      res.locals.queryResultMessage = queryResult.message;
+      res.locals.queryResult = queryResult;
       return next();
     });
   });
@@ -252,6 +243,7 @@ function addLocation(location, res, next){
 
 exports.dbOptions = dbOptions;
 exports.UserData = UserData;
+exports.Location = Location;
 exports.QueryOptions = QueryOptions;
 exports.addUser = addUser;
 exports.findUser = findUser;

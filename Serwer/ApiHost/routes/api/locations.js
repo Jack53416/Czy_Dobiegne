@@ -76,7 +76,9 @@ router.use(authorize.verifyToken);
 
    var querySettings = helpers.validateStandardQuery(req.query);
    database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, 'CITY = ?', [req.params.city]), res, next);
-
+ },
+  function(req, res){
+      res.json(res.locals.queryResult);
  });
 
  module.exports = router;

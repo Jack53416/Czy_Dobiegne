@@ -102,6 +102,9 @@ router.get('/locations', function(req, res, next){
   var whereQuery = latitude.join(" AND ") + " AND " + longitude.join( " AND ");
   database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, whereQuery), res, next);
 
+},
+  function(req, res){
+    res.json(res.locals.queryResult);
 });
 
 module.exports = router;
