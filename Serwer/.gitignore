@@ -18,7 +18,13 @@ ExportedObj/
 
 #Node dependecies
 /ApiHost/node_modules
+
+#Additional dependecies
 fb-config.json
+cert.pem
+key.pem
+clientTokenSettings.json
+/ApiHost/public
 
 #Atom files
 .tern-project

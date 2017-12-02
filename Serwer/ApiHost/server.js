@@ -27,7 +27,7 @@ var options = {
   // import swaggerDefinitions
   swaggerDefinition: swaggerDefinition,
   // path to the API docs
-  apis: ['./routes/*.js'],
+  apis: ['./routes/*.js', './routes/api/*.js'],
 };
 // initialize swagger-jsdoc
 var swaggerSpec = swaggerJSDoc(options);

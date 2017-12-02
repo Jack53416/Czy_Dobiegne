@@ -49,11 +49,20 @@ var database = require('../database.js');
 /**
   * @swagger
   * securityDefinitions:
-  *   bearerAuth:
+  *   userAuthorization:
   *     type: apiKey
   *     name: x-access-token
   *     in: header
  */
+
+ /**
+   * @swagger
+   * securityDefinitions:
+   *   apiClientAuthorization:
+   *     type: apiKey
+   *     name: x-client-token
+   *     in: header
+  */
 
 
  /**

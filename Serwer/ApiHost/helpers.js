@@ -2,7 +2,8 @@
 var fs = require("fs");
 var crypto = require('crypto');
 var path = require('path');
-
+var assert = require('assert');
+var validator = require('validator');
 
 const readDirectorySync = (dir, usrFilter) =>
  fs.readdirSync(dir)
@@ -51,8 +52,33 @@ function escapeColumnNames(inputString){
   }).join(',');
 }
 
+
+function validateStandardQuery(query){
+  var count = 200;
+  var offset = 0;
+  var fields = "";
+
+  assert.ok(query.hasOwnProperty('fields'), 'No fields property');
+  assert.ok(query.fields.length > 0, 'No fields specified');
+
+  fields = query.fields;
+
+  if(query.hasOwnProperty('count')){
+     assert.ok(validator.isInt(query.count, {"min":1, "max": 200}), 'count should be a value between 1 and 200');
+     count = parseInt(query.count);
+  }
+
+  if(query.hasOwnProperty('offset')){
+    assert.ok(validator.isInt(query.offset, {"min":0}), 'offset is invalid');
+    offset = parseInt(query.offset);
+  }
+  return {count: count, offset: offset, fields : fields};
+
+}
+
 exports.readJSONFile = readJSONFile;
 exports.hashData = hashData;
 exports.generateSalt = generateSalt;
 exports.escapeColumnNames = escapeColumnNames;
 exports.readDirectorySync = readDirectorySync;
+exports.validateStandardQuery = validateStandardQuery;

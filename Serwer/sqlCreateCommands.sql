@@ -85,3 +85,45 @@ SELECT TOILETS.PRICE_MIN, TOILETS.PRICE_MAX, TOILETS.DESCRIPTION, TOILETS.RATING
 FROM TOILETS
 JOIN LOCATIONS ON TOILETS.ID_LOCATION = LOCATIONS.ID
 WHERE TOILETS.VALIDATED = 'Y';
+
+
+--Procedures
+
+CREATE OR ALTER PROCEDURE ADD_LOCATION
+(loc_name VARCHAR(100), loc_country VARCHAR(100), loc_city VARCHAR(100), loc_street VARCHAR(100), loc_longitude DECIMAL(10,7), loc_latitude DECIMAL(10,7))
+RETURNS (new_loc_id INTEGER)
+AS
+BEGIN
+	INSERT INTO LOCATIONS (NAME, COUNTRY, CITY, STREET, LONGITUDE, LATITUDE)
+	VALUES(:loc_name, :loc_country, :loc_city, :loc_street, :loc_longitude, :loc_latitude);
+
+	SELECT LOCATIONS.ID FROM LOCATIONS WHERE
+	LOCATIONS.LONGITUDE = :loc_longitude AND LOCATIONS.LATITUDE = :loc_latitude AND LOCATIONS.STREET = :loc_street
+	INTO :new_loc_id;
+END
+
+
+
+
+CREATE OR ALTER PROCEDURE ADD_TOILET
+(loc_name VARCHAR(100), loc_country VARCHAR(100), loc_city VARCHAR(100), loc_street VARCHAR(100), loc_longitude DECIMAL(10,7), loc_latitude DECIMAL(10,7),
+ toil_priceMin DECIMAL(5,2), toil_priceMax DECIMAL(5,2), toil_description VARCHAR(200))
+RETURNS (code INTEGER, message VARCHAR(120))
+ AS
+ DECLARE loc_id INTEGER;
+ BEGIN
+	 SELECT LOCATIONS.ID FROM LOCATIONS
+	 WHERE LOCATIONS.LATITUDE = :loc_latitude AND LOCATIONS.LONGITUDE = :loc_longitude
+	 INTO :loc_id;
+
+	 IF (:loc_id IS NULL) THEN
+	 BEGIN
+		EXECUTE PROCEDURE ADD_LOCATION(:loc_name, :loc_country, :loc_city, :loc_street, :loc_longitude, :loc_latitude)
+		RETURNING_VALUES :loc_id;
+	 END
+
+	 INSERT INTO TOILETS (ID_LOCATION, PRICE_MIN, PRICE_MAX, DESCRIPTION, RATING, VOTE_NR, VALIDATED)
+	 VALUES (:loc_id, :toil_priceMin, :toil_priceMax, :toil_description, 0, 0, 'N');
+
+	 SELECT 0, 'Success' FROM RDB$DATABASE INTO :code, :message;
+ END

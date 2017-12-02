@@ -12,12 +12,43 @@ var dbOptions = helpers.readJSONFile('fb-config.json');
  * @constructor
  */
 function UserData(username, email, password){
-  this.username = username;
-  this.email = email;
-  this.password = password;
+  this.username = typeof username  !== 'undefined' ?  username  : '';
+  this.email = typeof email !== 'undefined' ? email : '';
+  this.password = typeof password !== 'undefined' ? password  : '';
   this.salt = helpers.generateSalt();
-  this.passwordEncrypted = helpers.hashData('sha256', this.password + this.salt, 'base64');
+  this.passwordEncrypted = this.encryptPassword();
 }
+
+UserData.prototype.encryptPassword = function(){
+  this.passwordEncrypted =  helpers.hashData('sha256', this.password + this.salt, 'base64');
+}
+
+/**
+ * Creates new instance of location object
+ * @param       {string} country     coutry name, required
+ * @param       {string} city        city name, required
+ * @param       {string} street      full street address, required
+ * @param       {number} longitude   latitude value, required
+ * @param       {number} latitude    longitude value, required
+ * @param       {string} name        name of the location, optional
+ * @param       {number} price_min   minimal price, optional
+ * @param       {number} price_max   maximal price, optional
+ * @param       {string} description location's description, optional
+ * @constructor
+ */
+function Location(country, city, street, longitude, latitude, name, price_min,
+                  price_max, description){
+  this.country = country;
+  this.city = city;
+  this.street = street;
+  this.longitude = longitude;
+  this.latitude = latitude;
+  this.name = typeof name !== 'undefined' ? name : null;
+  this.price_min = typeof price_min !== 'undefined' ? price_max : 0;
+  this.price_max = typeof price_max !== 'undefined' ? price_max : this.price_min;
+  this.description = typeof description !== 'undefined' ? description : null;
+}
+
 
 /**
  * Creates new instance of QueryOptions object
@@ -45,6 +76,18 @@ QueryOptions.prototype.getSimpleQuery = function(tableName){
   return "SELECT FIRST " + this.count + " SKIP " + this.offset + " " +
                  this.fields + " FROM " + tableName + this.whereString;
 }
+
+/**
+ * Returns query string for count operation on specified table and where clause
+ * @param  {string} tableName name of the table to query
+ * @return {string}           query string
+ */
+QueryOptions.prototype.getCountQuery = function(tableName){
+  return "SELECT COUNT(*) FROM " + tableName + this.whereString;
+}
+
+
+
 /**
  * adds user to the databsae based od userData
  * @param {UserData} userData userData object, contains(username, email, password, passwordEncrypted, salt)
@@ -88,7 +131,7 @@ function findUser(username, res, callback){
                [username, username], function(err, queryResult){
                 db.detach();
                 if(err){
-                  callback(err);
+                  return callback(err);
                 }
                 console.log(queryResult);
                 if(queryResult.length === 0){
@@ -98,6 +141,25 @@ function findUser(username, res, callback){
                 return callback();
               });
     });
+}
+
+function findUserById(id, res, next){
+  assert.ok(Number.isInteger(id), "argument must be integer!");
+
+  firebird.attach(dbOptions, function(err, db){
+    if(err)
+      throw err;
+
+    db.query("SELECT ID, USERNAME, EMAIL, PASSWORD, SALT, PERMISSIONS FROM USERS WHERE ID = ?",
+              [id], function(err, queryResult){
+                db.detach();
+                if(err){
+                  return next(err);
+                }
+                res.locals.userData = queryResult[0];
+                return next();
+              });
+  });
 }
 
 /**
@@ -115,6 +177,7 @@ function updateUser(userData, id, next){
     var sqlQuery = "UPDATE USERS\
                     SET USERNAME = ?, EMAIL = ?, PASSWORD = ?\
                     WHERE USERS.ID = " + firebird.escape(id);
+  console.log(sqlQuery);
    db.query(sqlQuery,
             [userData.username, userData.email, userData.passwordEncrypted],
             function(err, queryResult){
@@ -140,22 +203,51 @@ function getLocations(queryOptions, res, next){
     if(err){
       throw err;
     }
-     var sqlQuery = queryOptions.getSimpleQuery('TOILET_VIEW');
+    var sqlQuery = queryOptions.getSimpleQuery('TOILET_VIEW');
     console.log(sqlQuery);
     db.query(sqlQuery, queryOptions.whereParams, function(err, queryResult){
       db.detach();
       if(err){
         return next(err);
       }
-      res.json({"count": queryResult.length , "offset": queryOptions.offset, "data": queryResult});
+      res.locals.queryResult = {
+        "count": queryResult.length ,
+        "offset": queryOptions.offset,
+        "data": queryResult
+      };
+      return next();
+    });
+  });
+}
+
+
+function addLocation(location, res, next){
+  console.log(location);
+  firebird.attach(dbOptions, function(err, db){
+    if(err){
+      throw err;
+    }
+    var sqlQuery = "EXECUTE PROCEDURE ADD_TOILET (?,?,?,?,?,?,?,?,?)";
+    var sqlQuertParams = [location.name, location.country, location.city, location.street, location.latitude, location.longitude,
+                          location.price_min, location.price_max, location.description];
+    db.query(sqlQuery, sqlQuertParams, function(err, queryResult){
+      db.detach();
+      if(err){
+        return next(err);
+      }
+      res.locals.queryResult = queryResult;
+      return next();
     });
   });
 }
 
 exports.dbOptions = dbOptions;
 exports.UserData = UserData;
+exports.Location = Location;
 exports.QueryOptions = QueryOptions;
 exports.addUser = addUser;
 exports.findUser = findUser;
+exports.findUserById = findUserById;
 exports.updateUser = updateUser;
 exports.getLocations = getLocations;
+exports.addLocation = addLocation;
