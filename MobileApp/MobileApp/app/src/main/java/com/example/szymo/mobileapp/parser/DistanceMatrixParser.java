@@ -23,6 +23,7 @@ public class DistanceMatrixParser {
             final OLPJsonParser.OLPJsonArrayContext rows = ctx.createArrayContext("routes");
             rows.setIndex(0);
             final OLPJsonParser.OLPJsonArrayContext elements = rows.createArrayContext("legs");
+            if(elements!=null){
             elements.setIndex(0);
            if(elements.exists("distance","text")){
                distanceMatrixData.Distance=elements.value("distance","text").toString();
@@ -51,6 +52,9 @@ public class DistanceMatrixParser {
                             Double.parseDouble(steps.value("end_location","lng").toString()));
                     distanceMatrixData.pointons.add(positon);
                 }
+            }
+            }else {
+                return null;
             }
         } catch (JSONException e) {
             Log.e("Error Json parser to :",e.toString());

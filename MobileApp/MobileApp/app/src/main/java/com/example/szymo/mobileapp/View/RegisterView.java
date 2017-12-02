@@ -221,6 +221,27 @@ public class RegisterView extends LinearLayout {
             login_progress.setVisibility(GONE);
         }
     }
-    private void RegisterAction(){}
-
+    private void RegisterAction(){
+        final String login=login_input.getText().toString();
+        final String password=password_input.getText().toString();
+        final String email=email_input.getText().toString();
+        serverComunication.send(ServerComunication.RequestType.REGISTER,new OnServerDataResponseReceived(),login,email,password);
+    }
+    private class OnServerDataResponseReceived implements ServerComunication.IOnResponseReceived {
+        @Override
+        public void OnResponseReceived(final int code, final String data) {
+            if (data != null) {
+//                try {
+//                    mAccountInfo=new AccountInfoParser().parse(data);
+//                    serverComunication.setToken(mAccountInfo.mUserId);
+//                    mAccountInfo.save(mPrefs);
+//                    onAccountInfoChanged();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+                Toast.makeText(getContext(), R.string.register_correct, Toast.LENGTH_LONG).show();
+            }
+            login_progress.setVisibility(GONE);
+        }
+    }
 }

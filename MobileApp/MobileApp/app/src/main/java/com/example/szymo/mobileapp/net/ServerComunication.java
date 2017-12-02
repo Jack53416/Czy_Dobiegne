@@ -55,6 +55,7 @@ public class ServerComunication implements HostnameVerifier {
 
     public enum RequestType {
         LOGIN,
+        REGISTER,
         MARKER
     }
 
@@ -72,6 +73,8 @@ public class ServerComunication implements HostnameVerifier {
                 new RequestDataFromServer().execute(new ServerRequestData(type, callback, var));
                 return true;
             case LOGIN:
+                new RequestPostFromServer().execute(new ServerRequestData(type, callback, var));
+            case REGISTER:
                 new RequestPostFromServer().execute(new ServerRequestData(type, callback, var));
         }
         return false;
@@ -149,13 +152,18 @@ public class ServerComunication implements HostnameVerifier {
                 String login_pasword;
                 if (data.mUrlVariables.length<1) {
                     login_pasword = "username=admin&password=dupa34";
-                } else {
+                }else if(data.mUrlVariables.length<2)  {
                     login_pasword = "username=" + data.mUrlVariables[0] + "&password=" + data.mUrlVariables[1];
+                }else {
+                    login_pasword="username="+data.mUrlVariables[0]+"&email="+data.mUrlVariables[1]+"&password="+data.mUrlVariables[2];
                 }
 
                 byte[] postData = login_pasword.getBytes();
                 String url = requestUrl(serverUrl, data.mType);
                 HttpsURLConnection c = (HttpsURLConnection) createConnectionurlcoded(url, "POST");
+                if (clientToken != null&& data.mType==RequestType.REGISTER) {
+                    c.setRequestProperty("x-access-token", clientToken);
+                }
                 DataOutputStream out = new DataOutputStream(
                         c.getOutputStream());
                 out.write(postData);
@@ -182,6 +190,9 @@ public class ServerComunication implements HostnameVerifier {
                     return null;
                 case LOGIN:
                     resId = R.string.signin;
+                    break;
+                case REGISTER:
+                    resId=R.string.user_action;
                     break;
             }
             return ctx.getString(resId, BaseUrl);
