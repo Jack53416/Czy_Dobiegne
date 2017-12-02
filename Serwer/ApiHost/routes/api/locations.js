@@ -14,7 +14,8 @@ router.use(authorize.verifyToken);
  * /api/locations/{city}:
  *   get:
  *     security:
- *       - bearerAuth: []
+ *       - userAuthorization: []
+ *       - apiClientAuthorization: []
  *     tags:
  *       - Locations
  *     description: Returns a list of locations

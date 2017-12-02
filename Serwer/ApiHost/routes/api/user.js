@@ -17,7 +17,7 @@ router.use(authorize.verifyToken);
  * /api/user:
  *   post:
  *     security:
- *       - bearerAuth: []
+ *       - userAuthorization: []
  *     tags:
  *       - User
  *     description: Adds a new user
@@ -59,7 +59,7 @@ router.use(authorize.verifyToken);
  */
 
 router.post('/', function(req, res, next){
-  assert.equal(req.decoded.permissions, 'admin', "Access denied!");
+  assert.notEqual(req.decoded.permissions, 'regularUser', "Access denied!");
   validateUserRequestData(req);
 
   var newUserData = new database.UserData(req.body.username, req.body.email, req.body.password);
@@ -73,7 +73,7 @@ router.post('/', function(req, res, next){
  * /api/user:
  *   put:
  *     security:
- *       - bearerAuth: []
+ *       - userAuthorization: []
  *     tags:
  *       - User
  *     description: Modifies existing user. In order to change data at least one parameter is required. To modify only password send password param, to modify all, send all of them.
@@ -114,7 +114,7 @@ router.post('/', function(req, res, next){
  *
  */
 router.put('/', function(req, res, next){
-  assert.notEqual(req.decoded.permissions, 'admin', "Cannot change admin's user data!");
+  assert.Equal(req.decoded.permissions, 'regularUser', "You are not logged into the user account");
   database.findUserById(req.decoded.userId, res, next);
 },
   function(req, res, next){

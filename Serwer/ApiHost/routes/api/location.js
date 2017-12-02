@@ -17,7 +17,7 @@ var database = require('../../database.js');
  * /api/location:
  *   post:
  *     security:
- *       - bearerAuth: []
+ *       - userAuthorization: []
  *     tags:
  *       - Locations
  *     description: Adds new location

@@ -15,7 +15,8 @@ router.use(authorize.verifyToken);
  * /api/query/locations:
  *   get:
  *     security:
- *       - bearerAuth: []
+ *       - userAuthorization: []
+ *       - apiClientAuthorization: []
  *     tags:
  *       - Locations
  *     description: Returns a list of locations for a specified query
