@@ -3,6 +3,7 @@ package com.example.szymo.mobileapp.View;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -10,8 +11,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.example.szymo.mobileapp.ActivityMain;
 import com.example.szymo.mobileapp.R;
+import com.example.szymo.mobileapp.net.ServerComunication;
 
 /**
  * Created by szymo on 01.12.2017.
@@ -30,8 +34,11 @@ public class RegisterView extends LinearLayout {
     private ImageView email_input_clear;
     private Button login_button;
 
+    private ServerComunication serverComunication;
+    private Context ctx;
     public RegisterView(Context context) {
         super(context);
+        ctx=context;
         init();
     }
     private void init() {
@@ -58,6 +65,8 @@ public class RegisterView extends LinearLayout {
         email_input.addTextChangedListener(addEmailInput);
         email_input_clear.setOnClickListener(clearEditText(email_input));
         login_button.setOnClickListener(buttonLoginEvent);
+
+        serverComunication=((ActivityMain)ctx).mServerComunication;
         addView(inflated);
     }
 
@@ -186,6 +195,32 @@ public class RegisterView extends LinearLayout {
         @Override
         public void onClick(View v) {
         login_progress.setVisibility(VISIBLE);
+        isEmailValid();
         }
     };
+    private void isEmailValid() {
+
+        if(Patterns.EMAIL_ADDRESS.matcher(email_input.getText().toString()).matches())
+        {
+            isPasswordValid();
+        }
+        else{
+            Toast.makeText(getContext(), R.string.login_error_login_input, Toast.LENGTH_LONG).show();
+            login_progress.setVisibility(GONE);
+        }
+    }
+
+    private  void isPasswordValid(){
+
+        if(password_input.getText().toString().equals(password_input_again.getText().toString()))
+        {
+            RegisterAction();
+        }
+        else{
+            Toast.makeText(getContext(), R.string.login_error_password_input, Toast.LENGTH_LONG).show();
+            login_progress.setVisibility(GONE);
+        }
+    }
+    private void RegisterAction(){}
+
 }

@@ -10,8 +10,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.example.szymo.mobileapp.ActivityMain;
 import com.example.szymo.mobileapp.R;
+import com.example.szymo.mobileapp.net.ServerComunication;
+import com.example.szymo.mobileapp.parser.AccountInfoParser;
+
+import org.json.JSONException;
 
 /**
  * Created by szymo on 01.12.2017.
@@ -25,9 +31,11 @@ public class LoginView extends LinearLayout {
     private EditText password_input;
     private ImageView password_input_clear;
     private Button login_button;
-
+   private  ServerComunication serverComunication;
+    private Context ctx;
     public LoginView(Context context) {
         super(context);
+        ctx=context;
         init();
     }
 
@@ -49,6 +57,8 @@ public class LoginView extends LinearLayout {
         password_input.addTextChangedListener(addPasswordInput);
         password_input_clear.setOnClickListener(clearEditText(password_input));
         login_button.setOnClickListener(buttonLoginEvent);
+
+        serverComunication=((ActivityMain)ctx).mServerComunication;
         addView(inflated);
     }
 
@@ -121,6 +131,27 @@ public class LoginView extends LinearLayout {
         @Override
         public void onClick(View v) {
             login_progress.setVisibility(VISIBLE);
+            final String login=login_input.getText().toString();
+            final String password=password_input.getText().toString();
+            serverComunication.send(ServerComunication.RequestType.LOGIN,new OnServerDataResponseReceived(),login,password);
         }
     };
+
+    private class OnServerDataResponseReceived implements ServerComunication.IOnResponseReceived {
+        @Override
+        public void OnResponseReceived(final int code, final String data) {
+            if (data != null) {
+//                try {
+//                    mAccountInfo=new AccountInfoParser().parse(data);
+//                    serverComunication.setToken(mAccountInfo.mUserId);
+//                    mAccountInfo.save(mPrefs);
+//                    onAccountInfoChanged();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+                Toast.makeText(getContext(), R.string.login_correct, Toast.LENGTH_LONG).show();
+            }
+login_progress.setVisibility(GONE);
+        }
+    }
 }

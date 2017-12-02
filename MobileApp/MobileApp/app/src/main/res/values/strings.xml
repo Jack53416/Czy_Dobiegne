@@ -23,6 +23,9 @@
     <string name="password_hint">Hasło</string>
     <string name="email_hint">Email</string>
     <string name="password_hint_again">Powtórz hasło</string>
+    <string name="login_error_login_input">Błędny email</string>
+    <string name="login_correct">Udało się zalogować</string>
+    <string name="login_error_password_input">Podane hasła różnią się od siebie.</string>
     <string name="queryPosition">%1$s/api/query/locations?latitude=%2$s,%3$s&amp;longitude=%4$s,%5$s&amp;offset=%6$s&amp;fields=*</string>
     <string name="signin">%1$s/api/auth</string>
     <string name="GoooleDistance">http://maps.googleapis.com/maps/api/directions/json?origin=%1$s,%2$s&amp;destination=%3$s,%4$s&amp;sensor=false&amp;mode=driving</string>

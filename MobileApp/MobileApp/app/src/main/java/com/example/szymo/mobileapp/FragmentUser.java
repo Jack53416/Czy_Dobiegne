@@ -38,8 +38,8 @@ public class FragmentUser extends FragmentBase {
         super.onActivityCreated(savedInstanceState);
         final Context ctx = getContext();
         mAdapter = new PagerAdapter();
-        mAdapter.Add(new PagerAdapter.PagerEntry(new LoginView(ctx),ctx.getString(R.string.sign_in) ));
-        mAdapter.Add(new PagerAdapter.PagerEntry(new RegisterView(ctx),ctx.getString(R.string.regisetr) ));
+        mAdapter.Add(new PagerAdapter.PagerEntry(new LoginView(getActivity()),ctx.getString(R.string.sign_in) ));
+        mAdapter.Add(new PagerAdapter.PagerEntry(new RegisterView(getActivity()),ctx.getString(R.string.regisetr) ));
         //hookChildrenCallback();
         mPager.setAdapter(mAdapter);
         mTabs.setupWithViewPager(mPager);
