@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
+import { Map, Marker, Popup, TileLayer, Circle } from 'react-leaflet';
 import axios from 'axios';
 
 
@@ -71,6 +71,13 @@ class AppMap extends React.Component {
                         )
                     }
                 )}
+                <Circle center={this.state.userLocation} radius={100} color="blue" fillColor="blue">
+                <Popup>
+                    <span>
+                        Twoja lokalizacja
+                    </span>
+                </Popup>
+                </Circle>
             </Map>
         );
     }
