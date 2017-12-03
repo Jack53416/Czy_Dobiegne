@@ -14,6 +14,9 @@ module.exports = {
         path: __dirname,
         filename: "bundle.js"
     },
+    devServer: {
+        historyApiFallback: true
+    },
     module: {
         loaders: [
             { test: /\.scss$/, loader: "style-loader!css-loader!sass-loader" },

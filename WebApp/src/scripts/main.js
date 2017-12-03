@@ -8,10 +8,7 @@ import App from "./components/App";
 
 ReactDOM.render(
     <BrowserRouter>
-        <Switch>
-            <Route exact path="/" component={App} />
-            <Route component={App} />
-        </Switch>
+        {<App />}
     </BrowserRouter>,
     document.getElementById('container')
 );

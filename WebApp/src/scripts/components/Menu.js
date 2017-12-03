@@ -33,8 +33,8 @@ class Menu extends React.Component {
                         <NavItem eventKey={3}>Item 3</NavItem>
                     </Nav>
                     <Nav pullRight>
-                        <NavItem href="#"><Glyphicon glyph="user"/> Zarejestruj się</NavItem>
-                        <NavItem href="#"><Glyphicon glyph="log-in"/> Zaloguj</NavItem>
+                        <NavItem href="/register"><Glyphicon glyph="user"/> Zarejestruj się</NavItem>
+                        <NavItem href="/login"><Glyphicon glyph="log-in"/> Zaloguj</NavItem>
                     </Nav>
                 </Navbar.Collapse>
 
