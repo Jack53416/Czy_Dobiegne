@@ -16,7 +16,7 @@ function UserData(username, email, password){
   this.email = typeof email !== 'undefined' ? email : '';
   this.password = typeof password !== 'undefined' ? password  : '';
   this.salt = helpers.generateSalt();
-  this.passwordEncrypted = this.encryptPassword();
+  this.encryptPassword();
 }
 
 UserData.prototype.encryptPassword = function(){
