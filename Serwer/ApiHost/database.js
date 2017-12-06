@@ -162,6 +162,21 @@ function findUserById(id, res, next){
   });
 }
 
+
+function deleteUser(id, next){
+  firebird.attach(dbOptions, function(err, db){
+    if(err)
+      throw err;
+      var sqlQuery = "DELETE FROM USERS WHERE ID = ?";
+      db.query(sqlQuery, [id], function(err, result){
+        db.detach();
+        if(err)
+          return next(err);
+        return next();
+      });
+  });
+}
+
 /**
  * Updates user in the database based on id
  * @param  {UserData} userData userData object
@@ -246,6 +261,7 @@ exports.UserData = UserData;
 exports.Location = Location;
 exports.QueryOptions = QueryOptions;
 exports.addUser = addUser;
+exports.deleteUser = deleteUser;
 exports.findUser = findUser;
 exports.findUserById = findUserById;
 exports.updateUser = updateUser;
