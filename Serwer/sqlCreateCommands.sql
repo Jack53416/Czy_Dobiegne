@@ -127,3 +127,64 @@ RETURNS (code INTEGER, message VARCHAR(120))
 
 	 SELECT 0, 'Success' FROM RDB$DATABASE INTO :code, :message;
  END
+ 
+
+ 
+CREATE OR ALTER PROCEDURE UPDATE_LOCATION
+(toil_id INTEGER, loc_name VARCHAR(100), loc_country VARCHAR(100), loc_city VARCHAR(100),
+loc_street VARCHAR(100), loc_longitude DECIMAL(10,7), loc_latitude DECIMAL(10,7))
+RETURNS (code INTEGER, message VARCHAR(120))
+AS
+DECLARE loc_id INTEGER;
+DECLARE old_loc_id INTEGER;
+DECLARE toil_ref_count INTEGER;
+
+BEGIN
+	SELECT TOILETS.ID_LOCATION FROM TOILETS
+	WHERE TOILETS.ID = :toil_id
+	INTO :old_loc_id;
+	
+	SELECT LOCATIONS.ID FROM LOCATIONS
+	WHERE NAME = :loc_name AND COUNTRY = :loc_country AND CITY = :loc_city AND STREET = :loc_street
+				 	AND LATITUDE = :loc_latitude AND LONGITUDE = :loc_longitude
+	INTO :loc_id;
+	
+	
+	SELECT COUNT(TOILETS.ID) FROM TOILETS
+	WHERE ID_LOCATION = :old_loc_id
+	INTO :toil_ref_count;
+	
+	IF(:loc_id = :old_loc_id) THEN
+	BEGIN
+		SELECT -1, 'New value is the same as old one!' FROM RDB$DATABASE INTO :code, :message;
+		EXIT;
+	END 
+	
+	IF(:toil_ref_count = 1 AND :loc_id IS NULL) THEN
+	BEGIN
+		UPDATE LOCATIONS SET 
+		NAME = :loc_name,
+		COUNTRY = :loc_country,
+		CITY = :loc_city,
+		STREET = :loc_street,
+		LATITUDE = :loc_latitude,
+		LONGITUDE = :loc_longitude
+		WHERE ID = :old_loc_id;
+		SELECT 0, 'Location updated succesfully' FROM RDB$DATABASE INTO :code, :message;
+		EXIT;
+	END 
+	
+	IF(:loc_id IS NULL) THEN
+	BEGIN
+			EXECUTE PROCEDURE ADD_LOCATION(:loc_name, :loc_country, :loc_city, :loc_street, :loc_longitude, :loc_latitude)
+			RETURNING_VALUES :loc_id;
+	END 
+	UPDATE TOILETS SET
+	ID_LOCATION = :loc_id
+	WHERE ID = :toil_id;	
+	
+	SELECT 0, 'Location updated succesfully' FROM RDB$DATABASE INTO :code, :message;
+END 
+
+ 
+

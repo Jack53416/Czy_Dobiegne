@@ -134,7 +134,7 @@ router.post('/', function(req, res, next){
  * /api/location/{id}:
  *   put:
  *     security:
- *       - bearerAuth: []
+ *       -  userAuthorization: []
  *     tags:
  *       - Locations
  *     description: Edits current location, only id is required, the rest of the parameters are optional and only those that are sent will be updated
@@ -223,18 +223,37 @@ router.post('/', function(req, res, next){
 
 router.put('/:id', function(req, res, next){
     var id = req.params.id;
-    next();
-/*    var queryOptions = new database.QueryOptions(1 , 0, '*', 'TOILETS.ID=?', [id]);
-    database.getLocations(queryOptions, res, next);*/
+    assert(validator.isInt(id, {min: 0}), "Ivalid id parameter!");
+    var queryOptions = new database.QueryOptions(1 , 0, '*', 'ID=?', [id]);
+    database.getLocations(queryOptions, res, next);
+},
+  function(req, res, next){
+    var oldLocation = res.locals.queryResult.data[0];
+    if(typeof oldLocation === 'undefined')
+      next("Could not find location with id " + req.params.id);
+
+    oldLocation = getOptionalRequestParams(['name', 'country' , 'city', 'street', 'longitude', 'latitude', 'price_min', 'price_max', 'description'],
+                              oldLocation, req.body);
+    database.updateLocation(oldLocation, res, next);
 },
   function(req, res){
-    res.json({success: true, message: 'Toilet with id: ' + req.params.id + ' updated sucessfully'});
-});
+      console.log(res.locals.queryResult);
+      res.json({success: true, message: 'Toilet with id: ' + req.params.id + ' updated sucessfully'});
+  });
+
 
 function checkForRequestParams(requiredParams, body){
   for(param of requiredParams){
       assert.ok(body.hasOwnProperty(param), param + " field required!");
   }
+}
+
+function getOptionalRequestParams(optionalParams, locationObj, body){
+    for(param of optionalParams){
+      if(body.hasOwnProperty(param))
+        locationObj[param] = body[param];
+    }
+    return locationObj;
 }
 
 module.exports = router;

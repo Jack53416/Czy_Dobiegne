@@ -10,6 +10,9 @@ var database = require('../database.js');
  * definitions:
  *   Location:
  *     properties:
+ *       id:
+ *         type: number
+ *         format: integer
  *       price_min:
  *         type: number
  *         format: double

@@ -1,6 +1,7 @@
 var helpers = require('./helpers.js');
 var assert = require('assert');
 var firebird = require('node-firebird');
+var async = require('async');
 
 var dbOptions = helpers.readJSONFile('fb-config.json');
 
@@ -256,6 +257,42 @@ function addLocation(location, res, next){
   });
 }
 
+
+function updateLocation(location, res, next){
+  firebird.attach(dbOptions, function(err, db){
+    if(err){
+      throw err;
+    }
+    async.parallel([
+      function(callback){
+        var sqlQuery = "EXECUTE PROCEDURE UPDATE_LOCATION(?,?,?,?,?,?,?)";
+        var sqlQueryParams = [location.id, location.name, location.country, location.city, location.street, location.longitude, location.latitude];
+        db.query(sqlQuery, sqlQueryParams, function(err, queryResult){
+          db.detach();
+          if(err){
+            return callback(err);
+          }
+          return callback(null, queryResult);
+        });
+      },
+      function(callback){
+        var sqlQuery = "UPDATE TOILETS SET PRICE_MIN = ?, PRICE_MAX = ?, DESCRIPTION = ? WHERE ID = ?";
+        var sqlQueryParams = [location.price_min, location.price_max, location.description, location.id];
+        db.query(sqlQuery, sqlQueryParams, function(err, queryResult){
+          db.detach();
+          if(err){
+            return callback(err);
+          }
+          return callback(null, queryResult);
+        });
+      }
+    ], function(err, results){
+      res.locals.queryResult = results;
+      return next();
+    });
+  });
+}
+
 exports.dbOptions = dbOptions;
 exports.UserData = UserData;
 exports.Location = Location;
@@ -267,3 +304,4 @@ exports.findUserById = findUserById;
 exports.updateUser = updateUser;
 exports.getLocations = getLocations;
 exports.addLocation = addLocation;
+exports.updateLocation = updateLocation;
