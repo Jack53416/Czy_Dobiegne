@@ -87,8 +87,6 @@ QueryOptions.prototype.getCountQuery = function(tableName){
   return "SELECT COUNT(*) FROM " + tableName + this.whereString;
 }
 
-
-
 /**
  * adds user to the databsae based od userData
  * @param {UserData} userData userData object, contains(username, email, password, passwordEncrypted, salt)
@@ -144,6 +142,13 @@ function findUser(username, res, callback){
     });
 }
 
+/**
+ * Finds user data object based on specified id
+ * @param  {Int}   id   user id, usually obtained from token
+ * @param  {object}   res  response express object
+ * @param  {Function} next next express function callback
+ * @return {Function}      callback invocation
+ */
 function findUserById(id, res, next){
   assert.ok(Number.isInteger(id), "argument must be integer!");
 
@@ -163,7 +168,12 @@ function findUserById(id, res, next){
   });
 }
 
-
+/**
+ * Deletes user from the databese based on specified id
+ * @param  {Int}     id    user id, usually obtained from token
+ * @param  {Functio} next  express next function callback
+ * @return {Function}      callback invocation
+ */
 function deleteUser(id, next){
   firebird.attach(dbOptions, function(err, db){
     if(err)
@@ -219,24 +229,46 @@ function getLocations(queryOptions, res, next){
     if(err){
       throw err;
     }
-    var sqlQuery = queryOptions.getSimpleQuery('TOILET_VIEW');
-    console.log(sqlQuery);
-    db.query(sqlQuery, queryOptions.whereParams, function(err, queryResult){
-      db.detach();
-      if(err){
-        return next(err);
+    async.parallel([
+      function(callback){
+        var sqlQuery = queryOptions.getCountQuery('TOILET_VIEW');
+        db.query(sqlQuery, queryOptions.whereParams, function(err, queryResult){
+          if(err)
+            return callback(err);
+          callback(null, queryResult);
+        });
+      },
+      function(callback){
+        var sqlQuery = queryOptions.getSimpleQuery('TOILET_VIEW');
+        db.query(sqlQuery, queryOptions.whereParams, function(err, queryResult){
+          if(err){
+            return callback(err);
+          }
+          callback(null, queryResult);
+        });
       }
-      res.locals.queryResult = {
-        "count": queryResult.length ,
-        "offset": queryOptions.offset,
-        "data": queryResult
-      };
-      return next();
+    ],
+      function(err, result){
+        db.detach();
+        if(err)
+          return next(err);
+        res.locals.queryResult = {
+          "count": result[1].length ,
+          "offset": queryOptions.offset,
+          "total": result[0][0].count,
+          "data": result[1]
+        };
+        return next();
     });
   });
 }
 
-
+/**
+ * Adds new location to the database
+ * @param {Location} location Location object
+ * @param {object}   res      response express object
+ * @param {Function} next     express callback function
+ */
 function addLocation(location, res, next){
   console.log(location);
   firebird.attach(dbOptions, function(err, db){
@@ -257,6 +289,13 @@ function addLocation(location, res, next){
   });
 }
 
+/**
+ * Updates location based on location id inside location object
+ * @param  {Location} location Location object
+ * @param  {object}   res      response express object
+ * @param  {Function} next     express callback function
+ * @return {Function}            callback invocation
+ */
 
 function updateLocation(location, res, next){
   firebird.attach(dbOptions, function(err, db){
