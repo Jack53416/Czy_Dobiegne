@@ -59,6 +59,8 @@ router.use(authorize.verifyToken);
  *               type: integer
  *             offset:
  *               type: integer
+ *             total:
+ *               type: integer
  *             data:
  *               type: array
  *               items:

@@ -10,6 +10,9 @@ var database = require('../database.js');
  * definitions:
  *   Location:
  *     properties:
+ *       id:
+ *         type: number
+ *         format: integer
  *       price_min:
  *         type: number
  *         format: double
@@ -84,6 +87,8 @@ var database = require('../database.js');
   *               type: integer
   *             offset:
   *               type: integer
+  *             total:
+  *               type: integer
   *             data:
   *               type: array
   *               items:
@@ -94,22 +99,12 @@ var database = require('../database.js');
   */
 
 router.get("/", function (req, res, next) {
-  var count = 200;
-  var offset = 0;
-  var fields = '*';
-  fb.attach(database.dbOptions, function(err, db){
-    if(err)
-      throw err;
-      var sqlQuery = "SELECT FIRST " + count + " SKIP " + offset + " " +
-                     helpers.escapeColumnNames(fields) + " FROM TOILET_VIEW";
-      db.query(sqlQuery, function(err, queryResult){
-        db.detach();
-        if(err)
-          return next(err);
-        res.json({"count": queryResult.length , "offset": offset, "data": queryResult});
-      });
+  var queryOptions = new database.QueryOptions(200, 0, '*');
+  database.getLocations(queryOptions, res, next);
+},
+  function(req, res){
+    res.json(res.locals.queryResult);
   });
-});
 
 
 function ErrorHandlerGeneric(err, req, res, nex){

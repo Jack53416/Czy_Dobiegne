@@ -145,6 +145,40 @@ router.put('/', function(req, res, next){
    res.json({"sucess": true, "message": "Data updated successfully"});
 });
 
+/**
+ * @swagger
+ * /api/user:
+ *   delete:
+ *     security:
+ *       - userAuthorization: []
+ *     tags:
+ *       - User
+ *     description: Deletes user account
+ *     consumes:
+ *       - application/x-www-form-urlencoded
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: user deleted succesfully
+ *         schema:
+ *           $ref: '#/definitions/ApiResponse'
+ *       500:
+ *         description: general server error
+ *         schema:
+ *           $ref: '#/definitions/ApiResponse'
+ *
+ *
+ */
+
+
+router.delete('/', function(req, res, next){
+  var userId = req.decoded.userId;
+  database.deleteUser(userId, next);
+},
+  function(req, res){
+  res.json({"success" : true, "message": "User deleted succesfully"});
+});
 
 /**
  * validetes username, email, password in request containting userData
