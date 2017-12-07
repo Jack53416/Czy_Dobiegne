@@ -1,4 +1,5 @@
 <resources>
+    <string name="tokenApiAndroid">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOi0xLCJwZXJtaXNzaW9ucyI6ImFwaUNsaWVudCIsImlhdCI6MTUxMjI0NTExN30.M4qKvKNI6l7I1mzTf4EjQA274IeibK8qRMSIYa8NvI8</string>
     <string name="app_name">Czy dobiegnę ?</string>
     <string name="permissions_button">Uprawnienia</string>
     <string name="permission">Musisz zakceptować uprawnienia\n jeśli chesz korzystać z aplikacji</string>
@@ -17,6 +18,9 @@
 <string name="sign_in">Logowanie</string>
     <string name="regisetr">Rejestracja</string>
 
+    <string name="disconnect">dissconnect</string>
+    <string name="connect">connect</string>
+
     <string name="login_button">Zaloguj</string>
     <string name="login_hint">login</string>
     <string name="login_ime_action">Zaloguj</string>
@@ -33,4 +37,10 @@
     <string name="GoooleDistance">http://maps.googleapis.com/maps/api/directions/json?origin=%1$s,%2$s&amp;destination=%3$s,%4$s&amp;sensor=false&amp;mode=walking</string>
     <integer name="timeout_short" translatable="false">2000</integer>
     <integer name="timeout_medium" translatable="false">10000</integer>
+
+    <string name="popup_account_login_label">Login : </string>
+    <string name="popup_account_connected_info">Jesteś obecnie zalogowany</string>
+    <string name="popup_account_disconnected_btn">Zaloguj</string>
+    <string name="popup_account_disconnected_info">Zaloguj się do aplikacji.</string>
+    <string name="popup_account_connected_btn">Wyloguj</string>
 </resources>

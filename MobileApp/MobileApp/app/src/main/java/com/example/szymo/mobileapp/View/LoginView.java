@@ -1,6 +1,7 @@
 package com.example.szymo.mobileapp.View;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -13,9 +14,12 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.szymo.mobileapp.ActivityMain;
+import com.example.szymo.mobileapp.IMainFragment;
 import com.example.szymo.mobileapp.R;
+import com.example.szymo.mobileapp.data.AccountInfo;
 import com.example.szymo.mobileapp.net.ServerComunication;
 import com.example.szymo.mobileapp.parser.AccountInfoParser;
+import com.example.szymo.mobileapp.util.SharedPrefs;
 
 import org.json.JSONException;
 
@@ -33,9 +37,13 @@ public class LoginView extends LinearLayout {
     private Button login_button;
    private  ServerComunication serverComunication;
     private Context ctx;
-    public LoginView(Context context) {
+    private AccountInfo mAccountInfo;
+    private SharedPrefs mPrefs;
+    public LoginView(Context context, AccountInfo account, SharedPrefs prefs) {
         super(context);
         ctx=context;
+        mAccountInfo=account;
+        mPrefs=prefs;
         init();
     }
 
@@ -141,17 +149,24 @@ public class LoginView extends LinearLayout {
         @Override
         public void OnResponseReceived(final int code, final String data) {
             if (data != null) {
-//                try {
-//                    mAccountInfo=new AccountInfoParser().parse(data);
-//                    serverComunication.setToken(mAccountInfo.mUserId);
-//                    mAccountInfo.save(mPrefs);
-//                    onAccountInfoChanged();
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    mAccountInfo=new AccountInfoParser().parse(data);
+                    mAccountInfo.mUserName=login_input.getText().toString();
+                    serverComunication.setToken(mAccountInfo.mUserId);
+                    mAccountInfo.save(mPrefs);
+                    onAccountInfoChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 Toast.makeText(getContext(), R.string.login_correct, Toast.LENGTH_LONG).show();
             }
-login_progress.setVisibility(GONE);
+        login_progress.setVisibility(GONE);
         }
+    }
+    private void onAccountInfoChanged()
+    {
+            ((ActivityMain) ctx).onAccountInfoChanged(mAccountInfo);
+            ((ActivityMain)ctx).invalidateOptionsMenu();
+
     }
 }

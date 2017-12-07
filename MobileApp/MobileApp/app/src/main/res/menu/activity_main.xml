@@ -6,4 +6,9 @@
     android:icon="@drawable/ic_location"
     app:showAsAction="always"
     android:title="add localization"/>
+    <item
+        android:id="@+id/menu_action_login_state"
+        android:icon="@drawable/ic_person_red"
+        app:showAsAction="always"
+        android:title="@string/disconnect" />
 </menu>

@@ -150,9 +150,7 @@ public class ServerComunication implements HostnameVerifier {
             try {
 
                 String login_pasword;
-                if (data.mUrlVariables.length<1) {
-                    login_pasword = "username=admin&password=dupa34";
-                }else if(data.mUrlVariables.length<2)  {
+               if(data.mType==RequestType.LOGIN)  {
                     login_pasword = "username=" + data.mUrlVariables[0] + "&password=" + data.mUrlVariables[1];
                 }else {
                     login_pasword="username="+data.mUrlVariables[0]+"&email="+data.mUrlVariables[1]+"&password="+data.mUrlVariables[2];
@@ -161,8 +159,8 @@ public class ServerComunication implements HostnameVerifier {
                 byte[] postData = login_pasword.getBytes();
                 String url = requestUrl(serverUrl, data.mType);
                 HttpsURLConnection c = (HttpsURLConnection) createConnectionurlcoded(url, "POST");
-                if (clientToken != null&& data.mType==RequestType.REGISTER) {
-                    c.setRequestProperty("x-access-token", clientToken);
+                if(data.mType==RequestType.REGISTER){
+                c.setRequestProperty("x-client-token", ctx.getString(R.string.tokenApiAndroid));
                 }
                 DataOutputStream out = new DataOutputStream(
                         c.getOutputStream());
@@ -209,8 +207,8 @@ public class ServerComunication implements HostnameVerifier {
             try {
                 String url = requestUrl(serverUrl, data.mType, data.mUrlVariables);
                 HttpsURLConnection c = (HttpsURLConnection) createConnection(url, "GET");
-                if (clientToken != null) {
-                    c.setRequestProperty("x-access-token", clientToken);
+                if(data.mType==RequestType.MARKER){
+                c.setRequestProperty("x-client-token", ctx.getString(R.string.tokenApiAndroid));
                 }
                 return handleServerResponse(data, c);
             } catch (Exception e) {

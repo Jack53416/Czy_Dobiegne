@@ -9,6 +9,7 @@ import com.example.szymo.mobileapp.util.SharedPrefs;
 public class AccountInfo {
 
     public String mUserId;
+    public String mUserName;
     public AccountInfo()
     {
     }
@@ -18,14 +19,25 @@ public class AccountInfo {
      * @param prefs Application shared preferences
      */
     public AccountInfo(final SharedPrefs prefs)
-    { mUserId = prefs.Load(SharedPrefs.TOKEN, null);}
+    {
+        mUserId = prefs.Load(SharedPrefs.TOKEN, null);
+        mUserName = prefs.Load(SharedPrefs.NAME, null);
+    }
     public void save(final SharedPrefs prefs)
+
     {
         prefs.Save(SharedPrefs.TOKEN, mUserId);
+        prefs.Save(SharedPrefs.NAME, mUserName);
     }
     public void clear(final SharedPrefs prefs)
     {
         prefs.Clear(SharedPrefs.TOKEN);
+        prefs.Clear(SharedPrefs.NAME);
+        mUserName=null;
         mUserId=null;
+    }
+    public boolean isValid()
+    {
+        return mUserId != null;  // TODO?
     }
 }

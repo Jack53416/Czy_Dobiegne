@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@color/colorbackground"
+        android:elevation="6dp"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        app:elevation="6dp">
+
+
+        <TextView
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="@string/popup_account_disconnected_info"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" />
+
+        <Button
+            android:id="@+id/popup_account_action"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:drawablePadding="10dp"
+            android:drawableRight="@drawable/ma_connect"
+            android:gravity="right|center_vertical"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/popup_account_disconnected_btn"
+            android:textAllCaps="false"
+            android:textColor="@color/white"/>
+
+    </LinearLayout>
+</FrameLayout>

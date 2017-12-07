@@ -26,7 +26,7 @@ public abstract class FragmentBase extends android.support.v4.app.Fragment imple
 
 
     protected View mNoDataFrame;
-    private AccountInfo mAccountInfo;
+    protected AccountInfo mAccountInfo;
     protected SharedPrefs mPrefs;
     @Nullable
     @Override
@@ -41,6 +41,7 @@ public abstract class FragmentBase extends android.support.v4.app.Fragment imple
     {
         super.onAttach(context);
         mPrefs = new SharedPrefs(context);
+        mAccountInfo=((ActivityMain)context).getAccountInfo();
     }
 
     @Override

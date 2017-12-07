@@ -12,6 +12,7 @@ import android.util.Log;
 public class SharedPrefs {
     public static final String TOKEN="token";
     private static final String PREFS = "czy_dobiegne_prefs";
+    public static String NAME="name";
     private final SharedPreferences mPrefs;
     public SharedPrefs(final Context ctx)
     {
