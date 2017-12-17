@@ -26,8 +26,9 @@ class Menu extends React.Component {
                        
                     </Navbar.Text>
                     <Nav>
-                        <NavDropdown id="dropdown1" eventKey={1} title="Item 1">
-                            <MenuItem eventKey={1.1} href="#">Item 1.1</MenuItem>
+                        <NavDropdown id="dropdown1" eventKey={1} title="Lokalizacje">
+                        <   MenuItem eventKey={1.1} href="location">Lista</MenuItem>
+                            <MenuItem eventKey={1.1} href="locationadd">Dodaj nową</MenuItem>
                         </NavDropdown>
                         <NavItem eventKey={2}>Item 2</NavItem>
                         <NavItem eventKey={3}>Item 3</NavItem>
