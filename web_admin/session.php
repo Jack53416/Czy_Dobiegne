@@ -5,6 +5,8 @@ include_once "validate.php";
 class Session{
 	
 	function __construct($loginCanGo = false){
+		ini_set('session.gc_maxlifetime', 1800);
+		session_set_cookie_params(1800);
 		session_start();
 		
 		if($loginCanGo){
