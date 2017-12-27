@@ -12,7 +12,7 @@ $page->addContent('<div class="wrapper">');
 
 $page->addContent ($ses->login($_POST) ? "<div class='alert alert-danger center-alert'>Wpisane dane są nieprawidłowe.</div>" : "");
 
-$page->addContent('<form class="form-signin" action="/login.php" method="post">       
+$page->addContent('<form class="form-signin" action="login.php" method="post">       
       <h2 class="form-signin-heading">Please login</h2>
       <input type="text" class="form-control" name="username" placeholder="Username" required="" autofocus="" />
       <input type="password" class="form-control" name="password" placeholder="Password" required=""/>      
