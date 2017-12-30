@@ -65,7 +65,9 @@ function verifyToken(req, res, next){
   }
 
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
-  assert.ok(token, "No token provided, access denied!");
+  if(token === 'undefined'){
+    return next(new UnauthorizedAccessError("No token provided, access denied!"));
+  }
   jwt.verify(token, secretTokenKey, function(err, decoded){
     if(err){
       return next(new UnauthorizedAccessError("Invalid or timed out token"));

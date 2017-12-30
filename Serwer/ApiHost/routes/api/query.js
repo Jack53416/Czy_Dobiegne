@@ -93,8 +93,6 @@ var database = require('../../database.js');
 
 router.get('/locations', function(req, res, next){
 
-  //jacku miła praktyką jest umieszczanie stałych na poczatku, tak samo deklaracja zmiennych :D
-  //PS. zmien edytor :D zobacz ja kto w vim/nano/mcedit wyglada
   var re = /^([><=]|>=|<=)(\d+(\.\d+)?)$/;
   var re2 = /^([><=]|>=|<=)*$/;
   var addToQuery = '';

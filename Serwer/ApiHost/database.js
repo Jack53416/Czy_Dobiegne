@@ -64,7 +64,7 @@ function Location(country, city, street, longitude, latitude, name, price_min,
 function QueryOptions(count, offset, fields, whereString, whereParams){
   this.count = count;
   this.offset = offset;
-  this.fields = helpers.escapeColumnNames(fields);
+  this.fields = helpers.escapeColumnNames(fields.replace(/ /g, ''));
   whereString === undefined ? this.whereString = "" : this.whereString = " WHERE " + whereString;
   whereParams === undefined ? this.whereParams = [] : this.whereParams = whereParams;
 }
@@ -241,6 +241,7 @@ function getLocations(queryOptions, res, next){
       },
       function(callback){
         var sqlQuery = queryOptions.getSimpleQuery('TOILET_VIEW');
+        console.log(sqlQuery);
         db.query(sqlQuery, queryOptions.whereParams, function(err, queryResult){
           if(err){
             return callback(err);
@@ -336,6 +337,29 @@ function updateLocation(location, res, next){
   });
 }
 
+function updateTable(tableName, columns, values, whereString, whereValues, next){
+  firebird.attach(dbOptions, function(err, db){
+    if(err){
+      throw err;
+    }
+    let table = '"' + tableName + '"';
+    let sqlQuery = "UPDATE " + table + " SET";
+    for(let column of columns){
+      sqlQuery += " " + '"' + column.toUpperCase() + '" ' + "= ?,";
+    }
+    sqlQuery = sqlQuery.slice(0, -1);
+    sqlQuery += " WHERE " + whereString;
+    console.log(sqlQuery);
+    db.query(sqlQuery, values.concat(whereValues), function(err, queryResult){
+      db.detach();
+      if(err){
+        return next(new SqlError(err.message));
+      }
+      return next();
+    });
+  });
+}
+
 exports.dbOptions = dbOptions;
 exports.UserData = UserData;
 exports.Location = Location;
@@ -348,3 +372,4 @@ exports.updateUser = updateUser;
 exports.getLocations = getLocations;
 exports.addLocation = addLocation;
 exports.updateLocation = updateLocation;
+exports.updateTable = updateTable;
