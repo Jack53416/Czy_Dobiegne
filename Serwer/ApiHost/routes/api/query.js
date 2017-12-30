@@ -8,7 +8,8 @@ var helpers = require('../../helpers.js');
 var authorize = require('../../authorize.js');
 var database = require('../../database.js');
 
-router.use(authorize.verifyToken);
+
+//router.use(authorize.verifyToken);
 
 /**
  * @swagger
@@ -83,16 +84,53 @@ router.use(authorize.verifyToken);
 
 
 router.get('/locations', function(req, res, next){
+ 
+  //jacku miła praktyką jest umieszczanie stałych na poczatku, tak samo deklaracja zmiennych :D
+  //PS. zmien edytor :D zobacz ja kto w vim/nano/mcedit wyglada
+  var re = /^([><=]|>=|<=)(\d+(\.\d+)?)$/;
+  var re2 = /^([><=]|>=|<=)*$/;
+  var addToQuery = '';
+
+  //szerokosc
   assert.ok(req.query.hasOwnProperty('latitude'), "No latitude conditions provided");
   assert.ok(req.query.latitude.length > 0, "No latitude expression provided!");
+  
+  //dlugosz
   assert.ok(req.query.hasOwnProperty('longitude'), "No longitude conditions provided");
   assert.ok(req.query.latitude.length > 0, "No latitude expression provided!");
 
-  var querySettings = helpers.validateStandardQuery(req.query);
+  //rating
+  ///w taki sposób zbudowane poniewaz moze nie byc elementu rating 
+  if(typeof req.query.rating !== 'undefined'){
+    assert.ok(req.query.rating.length > 0, "No rating conditions provided");
+    assert.ok(re.exec(req.query.rating) != null, "Invalid expression " + req.query.rating);
+    addToQuery = addToQuery + " AND RATING " + req.query.rating;
+  }
+  
+  //price min
+  if(typeof req.query.price_max !== 'undefined'){
+    assert.ok(req.query.price_max.length > 0, "No price_max conditions provided");
+    assert.ok(re.exec(req.query.price_max) != null, "Invalid expression " + req.query.rating);
+    addToQuery = addToQuery + " AND PRICE_MAX " + req.query.price_max;
+  }
 
+  //price max
+  if(typeof req.query.price_min !== 'undefined'){
+    assert.ok(req.query.price_min.length > 0, "No price_min conditions provided");
+    assert.ok(re.exec(req.query.price_min) != null, "Invalid expression " + req.query.rating);
+    addToQuery = addToQuery + " AND PRICE_MIN " + req.query.price_min;
+  }
+
+  //street
+  if(typeof req.query.street !== 'undefined'){
+    assert.ok(req.query.street.length > 0, "No rating conditions provided");
+    addToQuery = addToQuery + " AND LOWER(STREET) LIKE LOWER('%" + req.query.street + "%') ";
+  }
+
+  var querySettings = helpers.validateStandardQuery(req.query);
   var longitude = req.query.longitude.split(',');
   var latitude = req.query.latitude.split(',');
-  var re = /^([><=]|>=|<=)(\d+(\.\d+)?)$/;
+  
   longitude.forEach( (item, idx, array) =>{
     assert.ok(re.exec(item) != null, "Invalid expression " + item);
     array[idx] =  item.replace(re, "LONGITUDE $1 $2");
@@ -102,8 +140,9 @@ router.get('/locations', function(req, res, next){
     assert.ok(re.exec(item) != null, "Invalid expression " + item);
     array[idx] =  item.replace(re, "LATITUDE $1 $2");
   });
-  var whereQuery = latitude.join(" AND ") + " AND " + longitude.join( " AND ");
-  database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, whereQuery), res, next);
+  
+  var whereQuery = latitude.join(" AND ") + " AND " + longitude.join( " AND ") + addToQuery;
+  database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, whereQuery ), res, next);
 
 },
   function(req, res){
