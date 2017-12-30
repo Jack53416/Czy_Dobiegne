@@ -243,6 +243,6 @@ public class ActivityMain extends ActivityBase implements IActivityAccess, Navig
         if (mAccountInfo != null) {
             return mAccountInfo;
         }
-        return mAccountInfo = new AccountInfo(mPrefs);
+        return mAccountInfo = new AccountInfo();
     }
 }

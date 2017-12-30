@@ -240,6 +240,9 @@ public class RegisterView extends LinearLayout {
 //                    e.printStackTrace();
 //                }
                 Toast.makeText(getContext(), R.string.register_correct, Toast.LENGTH_LONG).show();
+            }else
+            {
+                Toast.makeText(getContext(), R.string.register_uncorrect, Toast.LENGTH_LONG).show();
             }
             login_progress.setVisibility(GONE);
         }

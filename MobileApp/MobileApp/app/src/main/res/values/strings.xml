@@ -29,7 +29,9 @@
     <string name="password_hint_again">Powtórz hasło</string>
     <string name="login_error_login_input">Błędny email</string>
     <string name="login_correct">Udało się zalogować</string>
+    <string name="login_uncorrect">Nie udało się zalogować</string>
     <string name="register_correct">Udało się zarejestrować</string>
+    <string name="register_uncorrect">Nie udało się zarejestrować</string>
     <string name="login_error_password_input">Podane hasła różnią się od siebie.</string>
     <string name="queryPosition">%1$s/api/query/locations?latitude=%2$s,%3$s&amp;longitude=%4$s,%5$s&amp;offset=%6$s&amp;fields=*</string>
     <string name="signin">%1$s/api/auth</string>

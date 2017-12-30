@@ -13,25 +13,26 @@ import java.util.List;
 
 public class WcParser {
 
-    public List<WCData> parser(final String data)throws JSONException{
-        final List<WCData> response=new ArrayList<>();
-        final OLPJsonParser p=new OLPJsonParser();
-        final OLPJsonParser.OLPJsonContext ctx=p.parse(data);
+    public List<WCData> parser(final String data) throws JSONException {
+        final List<WCData> response = new ArrayList<>();
+        final OLPJsonParser p = new OLPJsonParser();
+        final OLPJsonParser.OLPJsonContext ctx = p.parse(data);
         final OLPJsonParser.OLPJsonArrayContext arrCtx = ctx.createArrayContext("data");
         for (int j = 0; j < arrCtx.length(); j++) {
             arrCtx.setIndex(j);
-            WCData wc=new WCData();
-                    wc.name=arrCtx.value("name");
-                    wc.Latitude=arrCtx.value("latitude");
-                    wc.Longitude=arrCtx.value("longitude");
-                    response.add(wc);
+            WCData wc = new WCData();
+            wc.name = arrCtx.value("name");
+            wc.Latitude = arrCtx.value("latitude");
+            wc.Longitude = arrCtx.value("longitude");
+            response.add(wc);
         }
         return response;
     }
-    public List<Integer> parserCount(final String data)throws JSONException{
-        List<Integer>list=new ArrayList<>();
-        final OLPJsonParser p=new OLPJsonParser();
-        final OLPJsonParser.OLPJsonContext ctx=p.parse(data);
+
+    public List<Integer> parserCount(final String data) throws JSONException {
+        List<Integer> list = new ArrayList<>();
+        final OLPJsonParser p = new OLPJsonParser();
+        final OLPJsonParser.OLPJsonContext ctx = p.parse(data);
         list.add(new Integer(ctx.value("count").toString()));
         list.add(new Integer(ctx.value("offset").toString()));
         return list;

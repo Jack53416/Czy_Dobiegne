@@ -155,10 +155,12 @@ public class LoginView extends LinearLayout {
                     serverComunication.setToken(mAccountInfo.mUserId);
                     mAccountInfo.save(mPrefs);
                     onAccountInfoChanged();
+                    Toast.makeText(getContext(), R.string.login_correct, Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Toast.makeText(getContext(), R.string.login_correct, Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(getContext(), R.string.login_uncorrect, Toast.LENGTH_LONG).show();
             }
         login_progress.setVisibility(GONE);
         }
