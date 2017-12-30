@@ -89,11 +89,18 @@ router.use(authorize.verifyToken);
  *         description: location added successfully
  *         schema:
  *           $ref: '#/definitions/ApiResponse'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
- *
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stack treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  *
  */
 router.post('/', function(req, res, next){
@@ -213,11 +220,18 @@ router.post('/', function(req, res, next){
  *         description: location added successfully
  *         schema:
  *           $ref: '#/definitions/ApiResponse'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
- *
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stackt treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  *
  */
 

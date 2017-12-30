@@ -76,15 +76,23 @@ var database = require('../../database.js');
  *               type: array
  *               items:
  *                 $ref: '#/definitions/Location'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stack treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  */
 
 
 router.get('/locations', function(req, res, next){
- 
+
   //jacku miła praktyką jest umieszczanie stałych na poczatku, tak samo deklaracja zmiennych :D
   //PS. zmien edytor :D zobacz ja kto w vim/nano/mcedit wyglada
   var re = /^([><=]|>=|<=)(\d+(\.\d+)?)$/;
@@ -94,19 +102,19 @@ router.get('/locations', function(req, res, next){
   //szerokosc
   assert.ok(req.query.hasOwnProperty('latitude'), "No latitude conditions provided");
   assert.ok(req.query.latitude.length > 0, "No latitude expression provided!");
-  
+
   //dlugosz
   assert.ok(req.query.hasOwnProperty('longitude'), "No longitude conditions provided");
   assert.ok(req.query.latitude.length > 0, "No latitude expression provided!");
 
   //rating
-  ///w taki sposób zbudowane poniewaz moze nie byc elementu rating 
+  ///w taki sposób zbudowane poniewaz moze nie byc elementu rating
   if(typeof req.query.rating !== 'undefined'){
     assert.ok(req.query.rating.length > 0, "No rating conditions provided");
     assert.ok(re.exec(req.query.rating) != null, "Invalid expression " + req.query.rating);
     addToQuery = addToQuery + " AND RATING " + req.query.rating;
   }
-  
+
   //price min
   if(typeof req.query.price_max !== 'undefined'){
     assert.ok(req.query.price_max.length > 0, "No price_max conditions provided");
@@ -130,7 +138,7 @@ router.get('/locations', function(req, res, next){
   var querySettings = helpers.validateStandardQuery(req.query);
   var longitude = req.query.longitude.split(',');
   var latitude = req.query.latitude.split(',');
-  
+
   longitude.forEach( (item, idx, array) =>{
     assert.ok(re.exec(item) != null, "Invalid expression " + item);
     array[idx] =  item.replace(re, "LONGITUDE $1 $2");
@@ -140,7 +148,7 @@ router.get('/locations', function(req, res, next){
     assert.ok(re.exec(item) != null, "Invalid expression " + item);
     array[idx] =  item.replace(re, "LATITUDE $1 $2");
   });
-  
+
   var whereQuery = latitude.join(" AND ") + " AND " + longitude.join( " AND ") + addToQuery;
   database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, whereQuery ), res, next);
 

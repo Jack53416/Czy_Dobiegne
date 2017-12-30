@@ -2,6 +2,7 @@ var helpers = require('./helpers.js');
 var assert = require('assert');
 var firebird = require('node-firebird');
 var async = require('async');
+const { SqlError, InvalidRequestError } = require('./helpers.js');
 
 var dbOptions = helpers.readJSONFile('fb-config.json');
 
@@ -102,7 +103,7 @@ function addUser(userData, callback){
     db.query(sqlQuery, [userData.username, userData.email, userData.passwordEncrypted, userData.salt], function(err, QueryResult){
       db.detach();
       if(err){
-        return callback(err);
+        return callback(new SqlError(err.message));
       }
       callback();
     });
@@ -134,7 +135,7 @@ function findUser(username, res, callback){
                 }
                 console.log(queryResult);
                 if(queryResult.length === 0){
-                  return callback(new Error("Invalid User!"));
+                  return callback(new InvalidRequestError("Invalid User!"));
                 }
                 res.locals.userData = queryResult[0];
                 return callback();
@@ -160,7 +161,7 @@ function findUserById(id, res, next){
               [id], function(err, queryResult){
                 db.detach();
                 if(err){
-                  return next(err);
+                  return next(new SqlError(err.message));
                 }
                 res.locals.userData = queryResult[0];
                 return next();
@@ -182,7 +183,7 @@ function deleteUser(id, next){
       db.query(sqlQuery, [id], function(err, result){
         db.detach();
         if(err)
-          return next(err);
+          return next(new SqlError(err.message));
         return next();
       });
   });
@@ -209,7 +210,7 @@ function updateUser(userData, id, next){
             function(err, queryResult){
               db.detach();
               if(err){
-                return next(err);
+                return next(new SqlError(err.message));
               }
               return next();
             });
@@ -251,7 +252,7 @@ function getLocations(queryOptions, res, next){
       function(err, result){
         db.detach();
         if(err)
-          return next(err);
+          return next(new SqlError(err.message));
         res.locals.queryResult = {
           "count": result[1].length ,
           "offset": queryOptions.offset,
@@ -281,7 +282,7 @@ function addLocation(location, res, next){
     db.query(sqlQuery, sqlQuertParams, function(err, queryResult){
       db.detach();
       if(err){
-        return next(err);
+        return next(new SqlError(err.message));
       }
       res.locals.queryResult = queryResult;
       return next();
@@ -309,7 +310,7 @@ function updateLocation(location, res, next){
         db.query(sqlQuery, sqlQueryParams, function(err, queryResult){
           db.detach();
           if(err){
-            return callback(err);
+            return callback(new SqlError(err.message));
           }
           return callback(null, queryResult);
         });
@@ -320,12 +321,15 @@ function updateLocation(location, res, next){
         db.query(sqlQuery, sqlQueryParams, function(err, queryResult){
           db.detach();
           if(err){
-            return callback(err);
+            return callback(new SqlError(err.message));
           }
           return callback(null, queryResult);
         });
       }
     ], function(err, results){
+      if(err){
+        return next(err);
+      }
       res.locals.queryResult = results;
       return next();
     });

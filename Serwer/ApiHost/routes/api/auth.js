@@ -2,9 +2,9 @@
 
 var express = require('express');
 var router  = express.Router();
-
 var assert = require('assert');
 var helpers = require('../../helpers.js');
+const { UnauthorizedAccessError } = require('../../helpers.js');
 var authorize = require('../../authorize.js');
 var database = require('../../database.js');
 
@@ -44,10 +44,14 @@ var database = require('../../database.js');
  *               type: string
  *             message:
  *               type: string
- *       500:
- *         description: general server error
+ *       401:
+ *         description: authorization failure, wrong credentials
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stack treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  */
 
 router.post('/', function(req, res, next){
@@ -57,7 +61,7 @@ router.post('/', function(req, res, next){
 
 }, function(req, res, next){
   if(!authorize.checkCredentials(res.locals.userData, req.body.password)){
-    return next(new Error("Invalid password!"));
+    return next(new UnauthorizedAccessError("Invalid password!"));
   }
   else{
       var payload = new authorize.TokenPayload(res.locals.userData.id, res.locals.userData.permissions);

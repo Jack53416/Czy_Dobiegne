@@ -65,20 +65,28 @@ router.use(authorize.verifyToken);
  *               type: array
  *               items:
  *                 $ref: '#/definitions/Location'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stack treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  */
 
  router.get('/:city', function(req, res, next){
    var count = 200;
    var offset = 0;
-   var fields = "";
-   var city = "";
 
    var querySettings = helpers.validateStandardQuery(req.query);
-   database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, 'CITY = ?', [req.params.city]), res, next);
+   var city = req.params.city.toLocaleLowerCase();
+
+   database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, 'LOWER(CITY) = ?', [city]), res, next);
  },
   function(req, res){
       res.json(res.locals.queryResult);

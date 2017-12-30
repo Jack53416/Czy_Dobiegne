@@ -2,6 +2,7 @@ var helpers = require('./helpers');
 var jwt = require('jsonwebtoken');
 var assert = require('assert');
 
+const { UnauthorizedAccessError } = require('./helpers.js');
 const clientTokenSetttings = helpers.readJSONFile('clientTokenSettings.json');
 var secretTokenKey = helpers.generateSalt();
 const tokenExpireTime = 30 * 60;
@@ -67,7 +68,7 @@ function verifyToken(req, res, next){
   assert.ok(token, "No token provided, access denied!");
   jwt.verify(token, secretTokenKey, function(err, decoded){
     if(err){
-      return next(new Error("Invalid or timed out token"));
+      return next(new UnauthorizedAccessError("Invalid or timed out token"));
     }
     req.decoded = decoded;
     return next();
