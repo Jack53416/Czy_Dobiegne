@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.EditText;
 
 import com.example.szymo.mobileapp.R;
 import com.example.szymo.mobileapp.util.StringUtil;
@@ -56,6 +57,7 @@ public class ServerComunication implements HostnameVerifier {
     public enum RequestType {
         LOGIN,
         REGISTER,
+        EDIT,
         MARKER
     }
 
@@ -74,8 +76,14 @@ public class ServerComunication implements HostnameVerifier {
                 return true;
             case LOGIN:
                 new RequestPostFromServer().execute(new ServerRequestData(type, callback, var));
+                return true;
             case REGISTER:
                 new RequestPostFromServer().execute(new ServerRequestData(type, callback, var));
+                return true;
+            case EDIT:
+                new RequestPutFromServer().execute(new ServerRequestData(type, callback, var));
+                return true;
+
         }
         return false;
     }
@@ -197,6 +205,77 @@ public class ServerComunication implements HostnameVerifier {
         }
     }
 
+    private class RequestPutFromServer extends AsyncTask<ServerRequestData, Void, ServerRequestData> {
+        private RequestPutFromServer() {
+        }
+
+        @Override
+        protected ServerRequestData doInBackground(ServerRequestData... serverRequestData) {
+            final ServerRequestData data = serverRequestData[0];
+            try {
+
+                String editdata="";
+                if(data.mType==RequestType.EDIT)  {
+                   editdata= editData(data.mUrlVariables);
+                }
+                byte[] postData = editdata.getBytes();
+                String url = requestUrl(serverUrl, data.mType);
+                HttpsURLConnection c = (HttpsURLConnection) createConnectionurlcoded(url, "PUT");
+                c.setRequestProperty("x-client-token", ctx.getString(R.string.tokenApiAndroid));
+                DataOutputStream out = new DataOutputStream(
+                        c.getOutputStream());
+                out.write(postData);
+                out.flush();
+                out.close();
+                return handleServerResponse(data, c);
+            } catch (Exception e) {
+                Log.e(String.valueOf(this), "exception during sending command to ESH", e);
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(final ServerRequestData data) {
+            if (data != null && data.mCallback != null) {
+                data.mCallback.OnResponseReceived(data.getCode(), data.mData);
+            }
+        }
+
+        private String editData(String ...value)
+        {
+            String output="";
+            if(!value[0].equals("")){
+                output+="username="+value[0];
+            }
+            if(!value[1].equals("")){
+                if(!output.equals("")){
+                    output+="&";
+                }
+                output+="email="+value[1];
+            }
+            if(!value[2].equals("")){
+                if(!output.equals("")){
+                    output+="&";
+                }
+                output+="&password="+value[2];
+            }
+            return output;
+        }
+
+        private String requestUrl(final String BaseUrl, final RequestType type) {
+            final int resId;
+            switch (type) {
+                default:
+                    return null;
+                case EDIT:
+                    resId = R.string.user_action;
+                    break;
+            }
+            return ctx.getString(resId, BaseUrl);
+        }
+    }
+
+
     private class RequestDataFromServer extends AsyncTask<ServerRequestData, Void, ServerRequestData> {
         private RequestDataFromServer() {
         }
@@ -208,7 +287,7 @@ public class ServerComunication implements HostnameVerifier {
                 String url = requestUrl(serverUrl, data.mType, data.mUrlVariables);
                 HttpsURLConnection c = (HttpsURLConnection) createConnection(url, "GET");
                 if(data.mType==RequestType.MARKER){
-                c.setRequestProperty("x-client-token", ctx.getString(R.string.tokenApiAndroid));
+                    c.setRequestProperty("x-client-token", ctx.getString(R.string.tokenApiAndroid));
                 }
                 return handleServerResponse(data, c);
             } catch (Exception e) {

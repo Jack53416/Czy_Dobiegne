@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.szymo.mobileapp.View.EditView;
 import com.example.szymo.mobileapp.View.LoginView;
 import com.example.szymo.mobileapp.View.RegisterView;
 import com.example.szymo.mobileapp.util.PagerAdapter;
@@ -41,7 +42,11 @@ public class FragmentUser extends FragmentBase {
         if(!mAccountInfo.isValid()){
         mAdapter.Add(new PagerAdapter.PagerEntry(new LoginView(getActivity(),mAccountInfo,mPrefs),ctx.getString(R.string.sign_in) ));
         }
+        else{
+            mAdapter.Add(new PagerAdapter.PagerEntry(new EditView(getActivity()),ctx.getString(R.string.edit) ));
+        }
         mAdapter.Add(new PagerAdapter.PagerEntry(new RegisterView(getActivity()),ctx.getString(R.string.regisetr) ));
+
         //hookChildrenCallback();
         mPager.setAdapter(mAdapter);
         mTabs.setupWithViewPager(mPager);

@@ -17,6 +17,7 @@
     <!--Menu-->
 <string name="sign_in">Logowanie</string>
     <string name="regisetr">Rejestracja</string>
+    <string name="edit">Edycja</string>
 
     <string name="disconnect">dissconnect</string>
     <string name="connect">connect</string>
@@ -32,6 +33,9 @@
     <string name="login_uncorrect">Nie udało się zalogować</string>
     <string name="register_correct">Udało się zarejestrować</string>
     <string name="register_uncorrect">Nie udało się zarejestrować</string>
+    <string name="edit_correct">Dane zmienione</string>
+    <string name="edit_const">Dane nie mogą zostać zmienione \n Zmień chociaż jedą daną!!1</string>
+    <string name="edit_uncorrect">Nie udało zmienić danych</string>
     <string name="login_error_password_input">Podane hasła różnią się od siebie.</string>
     <string name="queryPosition">%1$s/api/query/locations?latitude=%2$s,%3$s&amp;longitude=%4$s,%5$s&amp;offset=%6$s&amp;fields=*</string>
     <string name="signin">%1$s/api/auth</string>
