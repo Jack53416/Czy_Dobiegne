@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.szymo.mobileapp.controls.FakeCAB;
 import com.example.szymo.mobileapp.data.AccountInfo;
@@ -136,6 +137,21 @@ public class ActivityMain extends ActivityBase implements IActivityAccess, Navig
         if (id == R.id.menu_action_login_state) {
             displayAccountWindow();
             return true;
+        }
+        if(id==R.id.menu_add_localization){
+            if(mAccountInfo.isValid())
+            {
+                final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                final FragmentLocalization frag = new FragmentLocalization();
+                ft.replace(R.id.main_content, frag);
+                ft.commit();
+
+            }
+            else{
+                Toast.makeText(this, R.string.toast_add_localization, Toast.LENGTH_LONG).show();
+                displayAccountWindow();
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

@@ -23,6 +23,7 @@
     <string name="connect">connect</string>
 
     <string name="login_button">Zaloguj</string>
+    <string name="add_localization_button">Dodaj lokalizację</string>
     <string name="login_hint">login</string>
     <string name="login_ime_action">Zaloguj</string>
     <string name="password_hint">Hasło</string>
@@ -34,12 +35,13 @@
     <string name="register_correct">Udało się zarejestrować</string>
     <string name="register_uncorrect">Nie udało się zarejestrować</string>
     <string name="edit_correct">Dane zmienione</string>
-    <string name="edit_const">Dane nie mogą zostać zmienione \n Zmień chociaż jedą daną!!1</string>
+    <string name="edit_const">Dane nie mogą zostać zmienione \n Zmień chociaż jedą daną!!</string>
     <string name="edit_uncorrect">Nie udało zmienić danych</string>
     <string name="login_error_password_input">Podane hasła różnią się od siebie.</string>
     <string name="queryPosition">%1$s/api/query/locations?latitude=%2$s,%3$s&amp;longitude=%4$s,%5$s&amp;offset=%6$s&amp;fields=*</string>
     <string name="signin">%1$s/api/auth</string>
     <string name="user_action">%1$s/api/user</string>
+    <string name="localization">%1$s/api/location</string>
     <string name="GoooleDistance">http://maps.googleapis.com/maps/api/directions/json?origin=%1$s,%2$s&amp;destination=%3$s,%4$s&amp;sensor=false&amp;mode=walking</string>
     <integer name="timeout_short" translatable="false">2000</integer>
     <integer name="timeout_medium" translatable="false">10000</integer>
@@ -49,4 +51,6 @@
     <string name="popup_account_disconnected_btn">Zaloguj</string>
     <string name="popup_account_disconnected_info">Zaloguj się do aplikacji.</string>
     <string name="popup_account_connected_btn">Wyloguj</string>
+
+    <string name="toast_add_localization">Zaloguj się by dodać lokalizację</string>
 </resources>

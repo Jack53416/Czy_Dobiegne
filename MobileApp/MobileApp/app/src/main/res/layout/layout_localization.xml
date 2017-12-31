@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/main_activity_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center|top"
+    android:background="@color/colorbackground"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/name_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            >
+            <EditText
+                android:id="@+id/name"
+                style="@style/EditTextLogin"
+                android:hint="Nazwa"
+                android:singleLine="true"/>
+            <ImageView
+                android:id="@+id/name_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/ic_cancel"
+                android:visibility="gone"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/country_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/name_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp">
+            <EditText
+                android:id="@+id/country"
+                style="@style/EditTextLogin"
+                android:hint="@string/login_hint"
+                android:singleLine="true"/>
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/city_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/country_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp">
+            <EditText
+                android:id="@+id/city"
+                style="@style/EditTextLogin"
+                android:hint="@string/login_hint"
+                android:singleLine="true"/>
+        </FrameLayout>
+
+
+        <FrameLayout
+            android:id="@+id/street_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/city_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp">
+            <EditText
+                android:id="@+id/street"
+                style="@style/EditTextLogin"
+                android:hint="@string/login_hint"
+                android:singleLine="true"/>
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/lon_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/street_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp">
+            <EditText
+                android:id="@+id/lon"
+                style="@style/EditTextLogin"
+                android:hint="@string/login_hint"
+                android:singleLine="true"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/lat_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lon_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp">
+            <EditText
+                android:id="@+id/lat"
+                style="@style/EditTextLogin"
+                android:hint="@string/login_hint"
+                android:singleLine="true"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/price_min_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/lat_layout"
+            android:layout_marginTop="20dp">
+            >
+            <EditText
+                android:id="@+id/price_min"
+                style="@style/EditTextLogin"
+                android:hint="Cena minimalna(domyślnie 0)"
+                android:singleLine="true"/>
+            <ImageView
+                android:id="@+id/price_min_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/ic_cancel"
+                android:visibility="gone"/>
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/price_max_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/price_min_layout"
+            android:layout_marginTop="20dp"> android:layout_below="@id/price_min_layout"
+            android:layout_marginTop="20dp">
+            >
+            <EditText
+                android:id="@+id/price_max"
+                style="@style/EditTextLogin"
+                android:hint="Cena maksymalna(domyślnie 0)"
+                android:singleLine="true"/>
+            <ImageView
+                android:id="@+id/price_max_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/ic_cancel"
+                android:visibility="gone"/>
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/description_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/price_max_layout"
+            android:layout_marginTop="20dp">
+            >
+            <EditText
+                android:id="@+id/description"
+                style="@style/EditTextLogin"
+                android:hint="Komentarz"
+                android:singleLine="true"
+                android:inputType="textCapSentences|textMultiLine"
+                />
+            <ImageView
+                android:id="@+id/description_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/ic_cancel"
+                android:visibility="gone"/>
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/login_button"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@id/description_layout"
+            android:layout_below="@id/description_layout"
+            android:layout_marginTop="32dp"
+            android:text="@string/add_localization_button"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            />
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+
+
+</FrameLayout>

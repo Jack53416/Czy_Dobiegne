@@ -58,6 +58,7 @@ public class ServerComunication implements HostnameVerifier {
         LOGIN,
         REGISTER,
         EDIT,
+        ADDLOCALIZATION,
         MARKER
     }
 
@@ -77,6 +78,7 @@ public class ServerComunication implements HostnameVerifier {
             case LOGIN:
                 new RequestPostFromServer().execute(new ServerRequestData(type, callback, var));
                 return true;
+            case ADDLOCALIZATION:
             case REGISTER:
                 new RequestPostFromServer().execute(new ServerRequestData(type, callback, var));
                 return true;
@@ -157,18 +159,26 @@ public class ServerComunication implements HostnameVerifier {
             final ServerRequestData data = serverRequestData[0];
             try {
 
-                String login_pasword;
+                String login_pasword="";
                if(data.mType==RequestType.LOGIN)  {
                     login_pasword = "username=" + data.mUrlVariables[0] + "&password=" + data.mUrlVariables[1];
-                }else {
+                }else if(data.mType==RequestType.REGISTER) {
                     login_pasword="username="+data.mUrlVariables[0]+"&email="+data.mUrlVariables[1]+"&password="+data.mUrlVariables[2];
-                }
+                }else if(data.mType==RequestType.ADDLOCALIZATION){
+                   login_pasword=LocalizationOptions(data.mUrlVariables);
 
-                byte[] postData = login_pasword.getBytes();
+               }
+
+                byte[] postData = new byte[0];
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                    postData = login_pasword.getBytes(StandardCharsets.UTF_8);
+                }
                 String url = requestUrl(serverUrl, data.mType);
                 HttpsURLConnection c = (HttpsURLConnection) createConnectionurlcoded(url, "POST");
                 if(data.mType==RequestType.REGISTER){
                 c.setRequestProperty("x-client-token", ctx.getString(R.string.tokenApiAndroid));
+                }if(data.mType==RequestType.ADDLOCALIZATION){
+                    c.setRequestProperty("x-access-token", clientToken);
                 }
                 DataOutputStream out = new DataOutputStream(
                         c.getOutputStream());
@@ -181,7 +191,63 @@ public class ServerComunication implements HostnameVerifier {
             }
             return data;
         }
+        private String LocalizationOptions(String ...value)
+        {
+            String output="";
+            if(!value[0].equals("")){
+                output+="name="+value[0];
+            }
+            if(!value[1].equals("")){
+                if(!output.equals("")){
+                    output+="&";
+                }
+                output+="country="+value[1];
+            }
+            if(!value[2].equals("")){
+                if(!output.equals("")){
+                    output+="&";
+                }
+                output+="city="+value[2];
+            }
+            if(!value[3].equals("")){
+                if(!output.equals("")){
+                    output+="&";
+                }
+                output+="street="+value[3];
+            }
+            if(!value[4].equals("")){
+            if(!output.equals("")){
+                output+="&";
+            }
+            output+="longitude="+value[4];
+        }
+        if(!value[5].equals("")){
+            if(!output.equals("")){
+                output+="&";
+            }
+            output+="latitude="+value[5];
+        }
+            if(!value[6].equals("")){
+                if(!output.equals("")){
+                    output+="&";
+                }
+                output+="price_min="+value[6];
+            }
+            if(!value[7].equals("")){
+                if(!output.equals("")){
+                    output+="&";
+                }
+                output+="price_max="+value[7];
+            }
+            if(!value[8].equals("")){
+                if(!output.equals("")){
+                    output+="&";
+                }
+                output+="description="+value[8];
+            }
 
+            return output;
+        }
         @Override
         protected void onPostExecute(final ServerRequestData data) {
             if (data != null && data.mCallback != null) {
@@ -200,6 +266,8 @@ public class ServerComunication implements HostnameVerifier {
                 case REGISTER:
                     resId=R.string.user_action;
                     break;
+                case ADDLOCALIZATION:
+                    resId=R.string.localization;
             }
             return ctx.getString(resId, BaseUrl);
         }
@@ -221,7 +289,7 @@ public class ServerComunication implements HostnameVerifier {
                 byte[] postData = editdata.getBytes();
                 String url = requestUrl(serverUrl, data.mType);
                 HttpsURLConnection c = (HttpsURLConnection) createConnectionurlcoded(url, "PUT");
-                c.setRequestProperty("x-client-token", ctx.getString(R.string.tokenApiAndroid));
+                c.setRequestProperty("x-access-token", clientToken);
                 DataOutputStream out = new DataOutputStream(
                         c.getOutputStream());
                 out.write(postData);
@@ -257,7 +325,7 @@ public class ServerComunication implements HostnameVerifier {
                 if(!output.equals("")){
                     output+="&";
                 }
-                output+="&password="+value[2];
+                output+="password="+value[2];
             }
             return output;
         }
