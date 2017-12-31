@@ -28,6 +28,7 @@ var createRoutes = function (app) {
  };
 
 function apiErrorHandler(err, req, res, next){
+  console.error(err);
   if(err instanceof AssertionError){
     return res.status(400).json(new ErrorResponse(err, false));
   }
@@ -42,7 +43,6 @@ function apiErrorHandler(err, req, res, next){
 }
  function ErrorHandlerGeneric(err, req, res, next){
    res.status(500).json(new ErrorResponse(err, true));
-  console.error(err);
  }
 
 module.exports = createRoutes;

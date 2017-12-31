@@ -3,7 +3,9 @@
 var express = require('express');
 var router  = express.Router();
 
+const {escape} = require("node-firebird");
 var assert = require('assert');
+var validator = require('validator');
 var helpers = require('../../helpers.js');
 var authorize = require('../../authorize.js');
 var database = require('../../database.js');
@@ -38,6 +40,12 @@ var database = require('../../database.js');
  *         type: array
  *         items:
  *           type: string
+ *
+ *       - name: validated
+ *         description: boolean flag, default = true
+ *         in: query
+ *         required: false
+ *         type: boolean
  *
  *       - name: count
  *         description: max records in response, limit = 200
@@ -133,6 +141,19 @@ router.get('/locations', function(req, res, next){
     addToQuery = addToQuery + " AND LOWER(STREET) LIKE LOWER('%" + req.query.street + "%') ";
   }
 
+  if(req.query.hasOwnProperty('validated')){
+    assert.ok(validator.isBoolean(req.query.validated), req.query.validated + " is invlaid boolean value");
+    let validated = 'Y';
+    if(req.query.validated == 'false')
+    {
+      validated = 'N';
+    }
+    addToQuery += " AND VALIDATED =" + escape(validated);
+  }
+  else{
+    addToQuery += " AND VALIDATED = " + escape('Y');
+  }
+
   var querySettings = helpers.validateStandardQuery(req.query);
   var longitude = req.query.longitude.split(',');
   var latitude = req.query.latitude.split(',');
@@ -152,7 +173,7 @@ router.get('/locations', function(req, res, next){
 
 },
   function(req, res){
-    res.json(res.locals.queryResult);
+    res.status(200).json(res.locals.queryResult);
 });
 
 module.exports = router;

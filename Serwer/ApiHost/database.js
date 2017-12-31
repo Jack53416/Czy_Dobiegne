@@ -202,11 +202,11 @@ function updateUser(userData, id, next){
       throw err;
     }
     var sqlQuery = "UPDATE USERS\
-                    SET USERNAME = ?, EMAIL = ?, PASSWORD = ?\
+                    SET USERNAME = ?, EMAIL = ?, PASSWORD = ?, SALT = ?\
                     WHERE USERS.ID = " + firebird.escape(id);
   console.log(sqlQuery);
    db.query(sqlQuery,
-            [userData.username, userData.email, userData.passwordEncrypted],
+            [userData.username, userData.email, userData.passwordEncrypted, userData.salt],
             function(err, queryResult){
               db.detach();
               if(err){
@@ -254,6 +254,13 @@ function getLocations(queryOptions, res, next){
         db.detach();
         if(err)
           return next(new SqlError(err.message));
+
+        let data = result[1].map((record) => {
+          if(record.validated[0] == 'Y'){
+            return record.validated = true;
+          }
+          record.validated = false;
+        });
         res.locals.queryResult = {
           "count": result[1].length ,
           "offset": queryOptions.offset,
