@@ -27,7 +27,7 @@ class LocationAdd extends React.Component {
             country: "",
             city: "",
             street: "",
-            longitude : "",
+            longitude: "",
             latitude: "",
             priceMin: "",
             priceMax: "",
@@ -43,19 +43,19 @@ class LocationAdd extends React.Component {
             country: this.state.country,
             city: this.state.city,
             street: this.state.street,
-            longitude : this.state.longitude,
+            longitude: this.state.longitude,
             latitude: this.state.latitude,
             priceMin: this.state.priceMin,
             priceMax: this.state.priceMax,
             description: this.state.description
-          })
-          .then(function (response) {
-            console.log(response);
-            alert('!!!!!!! SUCCESS !!!!!!!')
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        })
+            .then(function (response) {
+                console.log(response);
+                alert('!!!!!!! SUCCESS !!!!!!!')
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
 
     handleChange(event) {
@@ -77,91 +77,95 @@ class LocationAdd extends React.Component {
     render() {
         return (
             <Row>
-            <Col xs={12}>
                 <form onSubmit={this.handleSave.bind(this)}>
                     <h2>Dodaj lokalizacje</h2>
-                    <FormGroup controlId="name" bsSize="large">
-                        <ControlLabel>Name</ControlLabel>
-                        <FormControl
-                            type="text"
-                            value={this.state.name}
-                            onChange={this.handleChange.bind(this)}
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="country" bsSize="large">
-                        <ControlLabel>Country</ControlLabel>
-                        <FormControl
-                            type="text"
-                            value={this.state.country}
-                            onChange={this.handleChange.bind(this)}
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="city" bsSize="large">
-                        <ControlLabel>City</ControlLabel>
-                        <FormControl
-                            value={this.state.city}
-                            onChange={this.handleChange.bind(this)}
-                            type="text"
-                        />
-                    </FormGroup>                        
-                    <FormGroup controlId="street" bsSize="large">
-                        <ControlLabel>Street</ControlLabel>
-                        <FormControl
-                            value={this.state.street}
-                            onChange={this.handleChange.bind(this)}
-                            type="text"
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="longitude" bsSize="large">
-                        <ControlLabel>Longitude</ControlLabel>
-                        <FormControl
-                            value={this.state.longitude}
-                            onChange={this.handleChange.bind(this)}
-                            type="text"
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="latitude" bsSize="large">
-                        <ControlLabel>Latitude</ControlLabel>
-                        <FormControl
-                            value={this.state.Latitude}
-                            onChange={this.handleChange.bind(this)}
-                            type="text"
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="priceMin" bsSize="large">
-                        <ControlLabel>Price Min</ControlLabel>
-                        <FormControl
-                            value={this.state.priceMin}
-                            onChange={this.handleChange.bind(this)}
-                            type="text"
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="priceMax" bsSize="large">
-                        <ControlLabel>Price Max</ControlLabel>
-                        <FormControl
-                            value={this.state.priceMax}
-                            onChange={this.handleChange.bind(this)}
-                            type="text"
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="description" bsSize="large">
-                        <ControlLabel>Description</ControlLabel>
-                        <FormControl
-                            value={this.state.description}
-                            onChange={this.handleChange.bind(this)}
-                            type="text"
-                        />
-                    </FormGroup>
-                    <Button
-                        block
-                        bsSize="large"
-                        disabled={!this.validateForm()}
-                        type="submit">
-                        Register
+                    <Col xs={6}>
+                        <FormGroup controlId="name" bsSize="large">
+                            <ControlLabel>Name</ControlLabel>
+                            <FormControl
+                                type="text"
+                                value={this.state.name}
+                                onChange={this.handleChange.bind(this)}
+                            />
+                        </FormGroup>
+                        <FormGroup controlId="country" bsSize="large">
+                            <ControlLabel>Country</ControlLabel>
+                            <FormControl
+                                type="text"
+                                value={this.state.country}
+                                onChange={this.handleChange.bind(this)}
+                            />
+                        </FormGroup>
+                        <FormGroup controlId="city" bsSize="large">
+                            <ControlLabel>City</ControlLabel>
+                            <FormControl
+                                value={this.state.city}
+                                onChange={this.handleChange.bind(this)}
+                                type="text"
+                            />
+                        </FormGroup>
+                        <FormGroup controlId="street" bsSize="large">
+                            <ControlLabel>Street</ControlLabel>
+                            <FormControl
+                                value={this.state.street}
+                                onChange={this.handleChange.bind(this)}
+                                type="text"
+                            />
+                        </FormGroup>
+                        <FormGroup controlId="description" bsSize="large">
+                            <ControlLabel>Description</ControlLabel>
+                            <FormControl
+                                value={this.state.description}
+                                onChange={this.handleChange.bind(this)}
+                                type="text"
+                            />
+                        </FormGroup>
+                    </Col>
+                    <Col xs={6}>
+                        <FormGroup controlId="longitude" bsSize="large">
+                            <ControlLabel>Longitude</ControlLabel>
+                            <FormControl
+                                value={this.state.longitude}
+                                onChange={this.handleChange.bind(this)}
+                                type="text"
+                            />
+                        </FormGroup>
+                        <FormGroup controlId="latitude" bsSize="large">
+                            <ControlLabel>Latitude</ControlLabel>
+                            <FormControl
+                                value={this.state.Latitude}
+                                onChange={this.handleChange.bind(this)}
+                                type="text"
+                            />
+                        </FormGroup>
+                        <FormGroup controlId="priceMin" bsSize="large">
+                            <ControlLabel>Price Min</ControlLabel>
+                            <FormControl
+                                value={this.state.priceMin}
+                                onChange={this.handleChange.bind(this)}
+                                type="text"
+                            />
+                        </FormGroup>
+                        <FormGroup controlId="priceMax" bsSize="large">
+                            <ControlLabel>Price Max</ControlLabel>
+                            <FormControl
+                                value={this.state.priceMax}
+                                onChange={this.handleChange.bind(this)}
+                                type="text"
+                            />
+                        </FormGroup>
+                    </Col>
+                    <Col xs={12}>
+                        <Button
+                            block
+                            bsSize="large"
+                            disabled={!this.validateForm()}
+                            type="submit">
+                            Dodaj
                     </Button>
+                    </Col>
                 </form>
-            </Col>
-        </Row>
+            </Row>
         );
     }
 }
