@@ -11,3 +11,17 @@ $icon-font-path: '~bootstrap-sass/assets/fonts/bootstrap/';
 body{
     background-color: rgb(219, 236, 255);
 }
+
+.map {
+    min-height: 90%;
+    height: 90%;
+}
+
+.dashboard{
+    background-color: rgb(49, 113, 168);
+}
+
+.maincontent {
+    min-height: 100%;
+    height: 100%;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom'
-import AppMap from './Map';
+import AppMap from './map/Dashboard';
 import Login from './Login';
 import UserDetails from './UserDetails';
 import LocationList from './location/LocationList';

@@ -2,7 +2,6 @@ import React from 'react';
 import Header from './Header';
 import Menu from './Menu';
 import Main from './Main';
-import AppMap from './Map';
 import {Grid, Row, Col, Clearfix} from 'react-bootstrap';
 
 class App extends React.Component {
@@ -14,7 +13,7 @@ class App extends React.Component {
                         <Menu />
                     </Col>
                 </Row>
-                <Row className="no-padding">
+                <Row className="no-padding maincontent">
                     <Col xs={12} className="no-padding">
                         <Main />
                     </Col>
