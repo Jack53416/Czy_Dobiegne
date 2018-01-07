@@ -1,7 +1,9 @@
 import React from 'react';
+import BaseComponent from './base/BaseComponent';
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import { Row, Col } from 'react-bootstrap';
 import axios from 'axios';
+import Querystring from 'query-string';
 
 const myApi = axios.create({
     baseURL: 'https://35.165.124.185/api/',
@@ -9,10 +11,11 @@ const myApi = axios.create({
     withCredentials: false,
     headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
+        'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token',
+        'X-Auth-Token': BaseComponent.userToken
     }
 });
 
@@ -32,11 +35,13 @@ class UserDetails extends React.Component {
     handleSave(event) {
         event.preventDefault();
 
-        myApi.put('/user', {
+        var data = Querystring.stringify({ 
             username: this.state.username,
             email: this.state.email,
             password: this.state.password
-          })
+          });
+
+        myApi.put('/user', data)
           .then(function (response) {
             console.log(response);
             alert('!!!!!!! SUCCESS !!!!!!!')
@@ -102,7 +107,7 @@ class UserDetails extends React.Component {
                             bsSize="large"
                             disabled={!this.validateForm()}
                             type="submit">
-                            Register
+                            Save
                         </Button>
                     </form>
                 </Col>

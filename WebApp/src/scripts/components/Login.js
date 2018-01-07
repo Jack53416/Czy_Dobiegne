@@ -1,23 +1,13 @@
 import React from "react";
+import BaseComponent from './base/BaseComponent';
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import styles from '../../styles/login.scss';
 import {Row, Col,} from 'react-bootstrap';
 import axios from 'axios';
+import Querystring from 'query-string';
+import { Redirect } from 'react-router-dom';
 
-const myApi = axios.create({
-  baseURL: 'https://35.165.124.185/api/',
-  timeout: 10000,
-  withCredentials: false,
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
-  }
-});
-
-class Login extends React.Component {
+class Login extends BaseComponent {
   constructor(props) {
     super(props);
 
@@ -59,30 +49,34 @@ class Login extends React.Component {
   handleRegisterSubmit(event) {
     event.preventDefault();
 
-    myApi.post('/user', {
-      username: this.state.register.username,
-      email: this.state.register.email,
-      password: this.state.register.password
-    })
+    var data = Querystring.stringify({ 
+      "username": this.state.register.username,
+      "password": this.state.register.password,
+      "email": this.state.register.email
+    });
+
+    BaseComponent.LoginApi.post('/user', data)
     .then(function (response) {
       console.log(response);
       alert('!!!!!!! SUCCESS !!!!!!!')
     })
     .catch(function (error) {
-      console.log(error);
+      alert(error);
     });
   }
 
   handleLoginSubmit(event) {
     event.preventDefault();
-
-    myApi.post('/auth', {
+    var data = Querystring.stringify({ 
       username: this.state.login.username,
       password: this.state.login.password
-    })
-    .then(function (response) {
-      console.log(response);
-      alert('!!!!!!! ZALOGOWANO !!!!!!!')
+    });
+
+    BaseComponent.LoginApi.post('/auth',data)
+    .then(res => {
+      console.log(res);
+      BaseComponent.logIn(res.data.token);
+      window.location.reload();
     })
     .catch(function (error) {
       console.log(error);

@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseComponent from '../BaseComponent';
+import BaseComponent from '../base//BaseComponent';
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import { Row, Col } from 'react-bootstrap';
 import axios from 'axios';

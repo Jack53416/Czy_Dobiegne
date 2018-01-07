@@ -1,23 +1,10 @@
 import React from 'react';
+import BaseComponent from '../base/BaseComponent';
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import { Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
-const myApi = axios.create({
-    baseURL: 'https://35.165.124.185/api',
-    timeout: 10000,
-    withCredentials: false,
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, X-Client-Token'
-    }
-});
-
-
-class LocationAdd extends React.Component {
+class LocationAdd extends BaseComponent {
 
     constructor(props) {
         super(props);
@@ -38,7 +25,7 @@ class LocationAdd extends React.Component {
     handleSave(event) {
         event.preventDefault();
 
-        myApi.post('/location', {
+        BaseComponent.Api.post('/location', {
             name: this.state.name,
             country: this.state.country,
             city: this.state.city,

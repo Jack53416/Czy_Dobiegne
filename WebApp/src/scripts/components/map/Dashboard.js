@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseComponent from '../BaseComponent';
+import BaseComponent from '../base/BaseComponent';
 import { Row, Col } from 'react-bootstrap';
 import Map from './Map';
 import Filter from './Filter';

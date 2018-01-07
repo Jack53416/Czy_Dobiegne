@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseComponent from '../BaseComponent';
+import BaseComponent from '../base/BaseComponent';
 import axios from 'axios';
 import { render } from 'react-dom';
 import { Map, Marker, Popup, TileLayer, Circle } from 'react-leaflet';
