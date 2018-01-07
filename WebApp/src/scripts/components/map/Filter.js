@@ -1,9 +1,10 @@
 import React from 'react';
+import BaseComponent from '../BaseComponent';
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import { Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
-class MapFilter extends React.Component {
+class MapFilter extends BaseComponent {
 
     constructor(props) {
         super(props);

@@ -1,39 +1,15 @@
 import React from 'react';
+import BaseComponent from '../BaseComponent';
+import axios from 'axios';
 import { render } from 'react-dom';
 import { Map, Marker, Popup, TileLayer, Circle } from 'react-leaflet';
-import axios from 'axios';
 
 
 const position = [51.75, 19.46];
 
-const api = {
-    method: 'GET',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, x-client-token',
-        'x-client-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOi0xLCJwZXJtaXNzaW9ucyI6ImFwaUNsaWVudCIsImlhdCI6MTUxMzQyMzIwNn0.ZMyiLAPQkRDzEJKh8iOKpP0slvvyL8rw5ZcEVBwFMUk'
-    },
-    mode: 'cors',
-    cache: 'default'
-};
 
-const myApi = axios.create({
-    baseURL: 'https://35.165.124.185/api',
-    timeout: 10000,
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token',
-        'x-client-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOi0xLCJwZXJtaXNzaW9ucyI6ImFwaUNsaWVudCIsImlhdCI6MTUxMzQyMzIwNn0.ZMyiLAPQkRDzEJKh8iOKpP0slvvyL8rw5ZcEVBwFMUk'
-    }
-});
 
-class AppMap extends React.Component {
+class AppMap extends BaseComponent {
     constructor(props) {
         super(props);
         this.items = props.items;
@@ -41,11 +17,10 @@ class AppMap extends React.Component {
         this.getLocations();
         this.centerMap = this.centerMap.bind(this);
         this.getUserLocation();
-
     }
 
     getLocations() {
-        myApi.get(`/locations/Łódź?fields=*`)
+        BaseComponent.Api.get(`/locations/Łódź?fields=*`)
             .then(res => {
                 this.setState({
                     locations: res.data.data
