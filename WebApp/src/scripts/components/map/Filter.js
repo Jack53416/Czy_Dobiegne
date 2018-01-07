@@ -10,7 +10,7 @@ class MapFilter extends BaseComponent {
         super(props);
 
         this.state = {
-            city: "",
+            city: "Łódź",
             street: "",
             priceMin: "",
             priceMax: "",
@@ -19,30 +19,14 @@ class MapFilter extends BaseComponent {
     }
 
     handleChange(event) {
-        console.log(this.state.rating);
         var id = event.target.id;
-        console.log(id);
         this.state[id] = event.target.value;
 
         this.forceUpdate();
       }
 
     filter(event) {
-        alert(this.state.rating);
-        //event.preventDefault();
-
-        //myApi.put('/user', {
-        //    username: this.state.username,
-        //    email: this.state.email,
-        //    password: this.state.password
-        //})
-        //    .then(function (response) {
-        //        console.log(response);
-        //        alert('!!!!!!! SUCCESS !!!!!!!')
-        //    })
-        //    .catch(function (error) {
-        //        console.log(error);
-        //    });
+        this.props.filterCallback(this.state);
     }
 
     render() {
@@ -99,7 +83,8 @@ class MapFilter extends BaseComponent {
                         <Button
                             block
                             bsSize="large"
-                            type="submit">
+                            onClick={this.filter.bind(this)}
+                            >
                             Filtruj
                         </Button>
                     </form>

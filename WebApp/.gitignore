@@ -5,3 +5,4 @@ npm-debug.log
 bundle.js
 *.ttf
 *.eot
+src/scripts/utils/constants.js

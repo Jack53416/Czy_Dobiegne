@@ -7,25 +7,13 @@ import { Map, Marker, Popup, TileLayer, Circle } from 'react-leaflet';
 
 const position = [51.75, 19.46];
 
-
-
 class AppMap extends BaseComponent {
     constructor(props) {
         super(props);
         this.items = props.items;
         this.state = { locations: [], userLocation: position };
-        this.getLocations();
         this.centerMap = this.centerMap.bind(this);
         this.getUserLocation();
-    }
-
-    getLocations() {
-        BaseComponent.Api.get(`/locations/Łódź?fields=*`)
-            .then(res => {
-                this.setState({
-                    locations: res.data.data
-                });
-            });
     }
 
     getUserLocation() {
@@ -48,7 +36,7 @@ class AppMap extends BaseComponent {
                 <TileLayer
                     url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' />
-                {this.state.locations.map(function (x, i) {
+                {this.props.locations.map(function (x, i) {
                     return (
                         <Marker key={i} position={[x.latitude, x.longitude]}>
                             <Popup>
