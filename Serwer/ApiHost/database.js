@@ -254,12 +254,13 @@ function getLocations(queryOptions, res, next){
         db.detach();
         if(err)
           return next(new SqlError(err.message));
-
         let data = result[1].map((record) => {
-          if(record.validated[0] == 'Y'){
-            return record.validated = true;
+          if(record.hasOwnProperty("validated")){
+            if(record.validated[0] == 'Y'){
+              return record.validated = true;
+            }
+            record.validated = false;
           }
-          record.validated = false;
         });
         res.locals.queryResult = {
           "count": result[1].length ,

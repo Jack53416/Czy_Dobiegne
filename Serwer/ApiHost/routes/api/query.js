@@ -33,6 +33,7 @@ var database = require('../../database.js');
  *         type: array
  *         items:
  *           type: string
+ *
  *       - name: longitude
  *         description: simple condition list for longitude ex <=19.233
  *         in: query
@@ -41,6 +42,30 @@ var database = require('../../database.js');
  *         items:
  *           type: string
  *
+ *       - name: rating
+ *         description: condition list for rating parameters
+ *         in: query
+ *         required: false
+ *         type: string
+ *
+ *       - name: price_max
+ *         description: condition list for price_max parameter
+ *         in: query
+ *         required: false
+ *         type: string
+ *
+ *       - name: price_min
+ *         description: condition list for price_min parameter
+ *         in: query
+ *         required: false
+ *         type: string
+ *
+ *       - name: street
+ *         description: street name to query
+ *         in: query
+ *         required: false
+ *         type: string
+ *         
  *       - name: validated
  *         description: boolean flag, default = true
  *         in: query

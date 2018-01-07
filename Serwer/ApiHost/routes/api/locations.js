@@ -126,20 +126,9 @@ router.use(authorize.verifyToken);
   *
   *     responses:
   *       200:
-  *         description: location
+  *         description: Validation status succesfully changed
   *         schema:
-  *           type: object
-  *           properties:
-  *             count:
-  *               type: integer
-  *             offset:
-  *               type: integer
-  *             total:
-  *               type: integer
-  *             data:
-  *               type: array
-  *               items:
-  *                 $ref: '#/definitions/Location'
+ *           $ref: '#/definitions/ApiResponse'
   *       401:
   *         description: Access denied
   *         schema:

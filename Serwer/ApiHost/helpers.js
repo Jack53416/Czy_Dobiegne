@@ -32,7 +32,7 @@ class ForbiddenAccessError extends Error{
 class SqlError extends Error{
   constructor(...args){
     super(...args);
-    this.code = 503;
+    this.code = 501;
     Error.captureStackTrace(this, ForbiddenAccessError);
   }
 }
