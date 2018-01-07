@@ -2,6 +2,7 @@ var helpers = require('./helpers.js');
 var assert = require('assert');
 var firebird = require('node-firebird');
 var async = require('async');
+const { SqlError, InvalidRequestError } = require('./helpers.js');
 
 var dbOptions = helpers.readJSONFile('fb-config.json');
 
@@ -63,7 +64,7 @@ function Location(country, city, street, longitude, latitude, name, price_min,
 function QueryOptions(count, offset, fields, whereString, whereParams){
   this.count = count;
   this.offset = offset;
-  this.fields = helpers.escapeColumnNames(fields);
+  this.fields = helpers.escapeColumnNames(fields.replace(/ /g, ''));
   whereString === undefined ? this.whereString = "" : this.whereString = " WHERE " + whereString;
   whereParams === undefined ? this.whereParams = [] : this.whereParams = whereParams;
 }
@@ -102,7 +103,7 @@ function addUser(userData, callback){
     db.query(sqlQuery, [userData.username, userData.email, userData.passwordEncrypted, userData.salt], function(err, QueryResult){
       db.detach();
       if(err){
-        return callback(err);
+        return callback(new SqlError(err.message));
       }
       callback();
     });
@@ -134,7 +135,7 @@ function findUser(username, res, callback){
                 }
                 console.log(queryResult);
                 if(queryResult.length === 0){
-                  return callback(new Error("Invalid User!"));
+                  return callback(new InvalidRequestError("Invalid User!"));
                 }
                 res.locals.userData = queryResult[0];
                 return callback();
@@ -160,7 +161,7 @@ function findUserById(id, res, next){
               [id], function(err, queryResult){
                 db.detach();
                 if(err){
-                  return next(err);
+                  return next(new SqlError(err.message));
                 }
                 res.locals.userData = queryResult[0];
                 return next();
@@ -182,7 +183,7 @@ function deleteUser(id, next){
       db.query(sqlQuery, [id], function(err, result){
         db.detach();
         if(err)
-          return next(err);
+          return next(new SqlError(err.message));
         return next();
       });
   });
@@ -201,15 +202,15 @@ function updateUser(userData, id, next){
       throw err;
     }
     var sqlQuery = "UPDATE USERS\
-                    SET USERNAME = ?, EMAIL = ?, PASSWORD = ?\
+                    SET USERNAME = ?, EMAIL = ?, PASSWORD = ?, SALT = ?\
                     WHERE USERS.ID = " + firebird.escape(id);
   console.log(sqlQuery);
    db.query(sqlQuery,
-            [userData.username, userData.email, userData.passwordEncrypted],
+            [userData.username, userData.email, userData.passwordEncrypted, userData.salt],
             function(err, queryResult){
               db.detach();
               if(err){
-                return next(err);
+                return next(new SqlError(err.message));
               }
               return next();
             });
@@ -240,6 +241,7 @@ function getLocations(queryOptions, res, next){
       },
       function(callback){
         var sqlQuery = queryOptions.getSimpleQuery('TOILET_VIEW');
+        console.log(sqlQuery);
         db.query(sqlQuery, queryOptions.whereParams, function(err, queryResult){
           if(err){
             return callback(err);
@@ -251,7 +253,15 @@ function getLocations(queryOptions, res, next){
       function(err, result){
         db.detach();
         if(err)
-          return next(err);
+          return next(new SqlError(err.message));
+        let data = result[1].map((record) => {
+          if(record.hasOwnProperty("validated")){
+            if(record.validated[0] == 'Y'){
+              return record.validated = true;
+            }
+            record.validated = false;
+          }
+        });
         res.locals.queryResult = {
           "count": result[1].length ,
           "offset": queryOptions.offset,
@@ -281,7 +291,7 @@ function addLocation(location, res, next){
     db.query(sqlQuery, sqlQuertParams, function(err, queryResult){
       db.detach();
       if(err){
-        return next(err);
+        return next(new SqlError(err.message));
       }
       res.locals.queryResult = queryResult;
       return next();
@@ -309,7 +319,7 @@ function updateLocation(location, res, next){
         db.query(sqlQuery, sqlQueryParams, function(err, queryResult){
           db.detach();
           if(err){
-            return callback(err);
+            return callback(new SqlError(err.message));
           }
           return callback(null, queryResult);
         });
@@ -320,13 +330,39 @@ function updateLocation(location, res, next){
         db.query(sqlQuery, sqlQueryParams, function(err, queryResult){
           db.detach();
           if(err){
-            return callback(err);
+            return callback(new SqlError(err.message));
           }
           return callback(null, queryResult);
         });
       }
     ], function(err, results){
+      if(err){
+        return next(err);
+      }
       res.locals.queryResult = results;
+      return next();
+    });
+  });
+}
+
+function updateTable(tableName, columns, values, whereString, whereValues, next){
+  firebird.attach(dbOptions, function(err, db){
+    if(err){
+      throw err;
+    }
+    let table = '"' + tableName + '"';
+    let sqlQuery = "UPDATE " + table + " SET";
+    for(let column of columns){
+      sqlQuery += " " + '"' + column.toUpperCase() + '" ' + "= ?,";
+    }
+    sqlQuery = sqlQuery.slice(0, -1);
+    sqlQuery += " WHERE " + whereString;
+    console.log(sqlQuery);
+    db.query(sqlQuery, values.concat(whereValues), function(err, queryResult){
+      db.detach();
+      if(err){
+        return next(new SqlError(err.message));
+      }
       return next();
     });
   });
@@ -344,3 +380,4 @@ exports.updateUser = updateUser;
 exports.getLocations = getLocations;
 exports.addLocation = addLocation;
 exports.updateLocation = updateLocation;
+exports.updateTable = updateTable;

@@ -3,9 +3,13 @@
 var express = require('express');
 var router  = express.Router();
 
+var assert = require('assert');
+var validator = require('validator');
 var helpers = require('../../helpers.js');
 var authorize = require('../../authorize.js');
 var database = require('../../database.js');
+
+const { InvalidRequestError, ForbiddenAccessError } = require('../../helpers.js');
 
 router.use(authorize.verifyToken);
 
@@ -65,23 +69,123 @@ router.use(authorize.verifyToken);
  *               type: array
  *               items:
  *                 $ref: '#/definitions/Location'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stack treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  */
 
  router.get('/:city', function(req, res, next){
    var count = 200;
    var offset = 0;
-   var fields = "";
-   var city = "";
 
    var querySettings = helpers.validateStandardQuery(req.query);
-   database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, 'CITY = ?', [req.params.city]), res, next);
+   var city = req.params.city.toLocaleLowerCase();
+
+   database.getLocations(new database.QueryOptions(querySettings.count, querySettings.offset, querySettings.fields, 'LOWER(CITY) = ?', [city]), res, next);
  },
   function(req, res){
       res.json(res.locals.queryResult);
  });
+
+
+ /**
+  * @swagger
+  * /api/locations/validationStatus:
+  *   put:
+  *     security:
+  *       - userAuthorization: []
+  *     tags:
+  *       - Locations
+  *     description: Changes the validation status for the Location
+  *     produces:
+  *       - application/json
+  *     parameters:
+  *       - name: status
+  *         description: new Validation status for locations with given ids
+  *         in: query
+  *         required: true
+  *         type: boolean
+  *
+  *       - name: idLocations
+  *         description: simple list of locations ids
+  *         in: query
+  *         required: true
+  *         type: array
+  *         items:
+  *           type: number
+  *           format: integer
+  *
+  *     responses:
+  *       200:
+  *         description: Validation status succesfully changed
+  *         schema:
+ *           $ref: '#/definitions/ApiResponse'
+  *       401:
+  *         description: Access denied
+  *         schema:
+  *           $ref: '#/definitions/ApiError'
+  *       500:
+  *         description: general server error, apart from general information, stack treace will be provided
+  *         schema:
+  *           $ref: '#/definitions/ApiError'
+  *       501:
+  *         description: Sql Error, something went wrong during sql query
+  *         schema:
+  *           $ref: '#/definitions/ApiError'
+  */
+
+
+
+router.put('/validationStatus', function(req, res, next){
+  console.log(req.decoded);
+  if(req.decoded.permissions !== 'admin'){
+    return next(new ForbiddenAccessError("Access denied!"));
+  }
+
+  if(!req.query.hasOwnProperty("status")){
+    return next(new InvalidRequestError("status field required!"));
+  }
+  if(!req.query.hasOwnProperty("idLocations")){
+    return next( new InvalidRequestError("idLocations field requred"));
+  }
+
+  assert.ok(validator.isBoolean(req.query.status), req.query.status + " is invalid Boolean");
+  assert.ok(req.query.idLocations.length > 0, "idLocations is invalid!");
+
+  req.query.idLocations = req.query.idLocations.replace(/ /g, '');
+
+  let validated = (req.query.status == "true");
+  if(validated){
+    validated = "Y";
+  }
+  else{
+    validated = "N";
+  }
+
+  let idArray = req.query.idLocations.split(",");
+  assert.ok(idArray.length > 0, "invalid idLocations!");
+  let whereString = 'ID IN (';
+  for(let id of idArray){
+    assert.ok(validator.isInt(id, {min:0}), id + " is invalid id");
+    whereString += "?,";
+  }
+  whereString = whereString.slice(0, -1);
+  whereString += ')';
+
+  database.updateTable('TOILETS', ['validated'], [validated], whereString, idArray, next);
+},
+  function(req, res){
+    res.status(200).json({success: true, message: "Validation status succesfully updated"});
+  });
+
 
  module.exports = router;

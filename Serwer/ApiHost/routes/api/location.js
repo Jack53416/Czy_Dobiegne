@@ -7,6 +7,7 @@ var assert = require('assert');
 var validator = require('validator');
 
 var helpers = require('../../helpers.js');
+const { InvalidRequestError } = require('../../helpers.js');
 var authorize = require('../../authorize.js');
 var database = require('../../database.js');
 
@@ -89,11 +90,18 @@ router.use(authorize.verifyToken);
  *         description: location added successfully
  *         schema:
  *           $ref: '#/definitions/ApiResponse'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
- *
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stack treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  *
  */
 router.post('/', function(req, res, next){
@@ -213,11 +221,18 @@ router.post('/', function(req, res, next){
  *         description: location added successfully
  *         schema:
  *           $ref: '#/definitions/ApiResponse'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
- *
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stackt treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  *
  */
 
@@ -230,7 +245,7 @@ router.put('/:id', function(req, res, next){
   function(req, res, next){
     var oldLocation = res.locals.queryResult.data[0];
     if(typeof oldLocation === 'undefined')
-      next("Could not find location with id " + req.params.id);
+      return next(new InvalidRequestError("Could not find location with id " + req.params.id));
 
     oldLocation = getOptionalRequestParams(['name', 'country' , 'city', 'street', 'longitude', 'latitude', 'price_min', 'price_max', 'description'],
                               oldLocation, req.body);
@@ -238,8 +253,93 @@ router.put('/:id', function(req, res, next){
 },
   function(req, res){
       console.log(res.locals.queryResult);
-      res.json({success: true, message: 'Toilet with id: ' + req.params.id + ' updated sucessfully'});
+      res.status(200).json({success: true, message: 'Toilet with id: ' + req.params.id + ' updated sucessfully'});
   });
+
+  /**
+   * @swagger
+   * /api/location/rate/{id}:
+   *   put:
+   *     security:
+   *       -  userAuthorization: []
+   *       -  apiClientAuthorization: []
+   *     tags:
+   *       - Locations
+   *     description: Rates the current location in the integer scale from 1 to 5
+   *     consumes:
+   *       - application/x-www-form-urlencoded
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: id
+   *         description: id of the currently edited locations
+   *         in: path
+   *         required: true
+   *         type: number
+   *         format: integer
+   *
+   *       - name: rating
+   *         description: rating for that toilet
+   *         in: formData
+   *         required: true
+   *         type: number
+   *         format: integer
+   *
+   *     responses:
+   *       200:
+   *         description: Rating updated succesfully
+   *         schema:
+   *           $ref: '#/definitions/ApiResponse'
+   *       401:
+   *         description: Access denied
+   *         schema:
+   *           $ref: '#/definitions/ApiError'
+   *       500:
+   *         description: general server error, apart from general information, stackt treace will be provided
+   *         schema:
+   *           $ref: '#/definitions/ApiError'
+   *       501:
+   *         description: Sql Error, something went wrong during sql query
+   *         schema:
+   *           $ref: '#/definitions/ApiError'
+   *
+   */
+
+
+  router.put('/rate/:id', function(req, res, next){
+    const id = req.params.id;
+    assert(validator.isInt(id, {min: 0}), "Ivalid id parameter!");
+    if(req.body.hasOwnProperty('rating')){
+      assert(validator.isInt(req.body.rating, {min: 1, max: 5}), "Invalid rating!, should be integer from 1 to 5");
+    }
+    else{
+      return next(new InvalidRequestError("No rating provided!"));
+    }
+    let queryOptions = new database.QueryOptions(1, 0 ,"rating, vote_nr", "ID=?", [id]);
+    database.getLocations(queryOptions, res, next);
+  },
+    function(req, res, next){
+      let location = res.locals.queryResult.data[0];
+      if(typeof location === 'undefined'){
+        return next(new InvalidRequestError("Could not find location with id " + req.params.id));
+      }
+      const rating = Number(req.body.rating);
+      location.rating = Number(location.rating);
+      location.vote_nr = Number(location.vote_nr);
+      location.rating = (location.rating * location.vote_nr + rating) / (location.vote_nr + 1);
+      location.vote_nr++;
+      res.locals.newRating = location.rating;
+      database.updateTable(
+        'TOILETS',
+        ['rating', 'vote_nr'],
+        [location.rating, location.vote_nr],
+        'ID=?',
+        [req.params.id],
+        next);
+    },
+      function(req, res){
+        res.status(200).json({success: true, message: 'Rating accepted', newRating: res.locals.newRating });
+      });
 
 
 function checkForRequestParams(requiredParams, body){

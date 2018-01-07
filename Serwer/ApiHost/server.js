@@ -5,6 +5,8 @@ var router = require("./router.js");
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var swaggerJSDoc = require('swagger-jsdoc');
+var cors = require('cors');
+
 const https = require('https');
 const fs = require('fs');
 
@@ -32,6 +34,12 @@ var options = {
 // initialize swagger-jsdoc
 var swaggerSpec = swaggerJSDoc(options);
 
+var corsOptions = {
+  origin: "*",
+  exposedHeaders: "*",
+  allowedHeaders: "*"
+};
+
 var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,6 +50,7 @@ app.set("view-engine", "ejs");
 
 app.use(express.static('public'));
 app.use(express.static('Scripts'));
+app.use(cors());
 
 // serve swagger
 app.get('/swagger', function(req, res) {

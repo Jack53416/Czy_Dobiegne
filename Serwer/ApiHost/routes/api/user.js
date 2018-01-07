@@ -7,6 +7,7 @@ var assert = require('assert');
 var validator = require('validator');
 
 var helpers = require('../../helpers.js');
+const { ForbiddenAccessError } = require('../../helpers.js');
 var authorize = require('../../authorize.js');
 var database = require('../../database.js');
 
@@ -51,16 +52,29 @@ router.use(authorize.verifyToken);
  *         description: user added succesfully
  *         schema:
  *           $ref: '#/definitions/ApiResponse'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
- *
+ *           $ref: '#/definitions/ApiError'
+ *       403:
+ *         description: Access forbidden, resource cannot be accessed with these permissions
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stackt treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  *
  */
 
 router.post('/', function(req, res, next){
-  assert.notEqual(req.decoded.permissions, 'regularUser', "Access denied!");
+  if(req.decoded.permissions === 'regularUser'){
+    return next(new ForbiddenAccessError("Access denied!"));
+  }
   validateUserRequestData(req);
 
   var newUserData = new database.UserData(req.body.username, req.body.email, req.body.password);
@@ -107,15 +121,29 @@ router.post('/', function(req, res, next){
  *         description: user updated succesfully
  *         schema:
  *           $ref: '#/definitions/ApiResponse'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
+ *           $ref: '#/definitions/ApiError'
+ *       403:
+ *         description: Access forbidden, resource cannot be accessed with these permissions
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stackt treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  *
  *
  */
 router.put('/', function(req, res, next){
-  assert.Equal(req.decoded.permissions, 'regularUser', "You are not logged into the user account");
+  if(req.decoded.permissions !== 'regularUser'){
+    return next(new ForbiddenAccessError("You are not logged into the user account"));
+  }
   database.findUserById(req.decoded.userId, res, next);
 },
   function(req, res, next){
@@ -163,11 +191,22 @@ router.put('/', function(req, res, next){
  *         description: user deleted succesfully
  *         schema:
  *           $ref: '#/definitions/ApiResponse'
- *       500:
- *         description: general server error
+ *       401:
+ *         description: Access denied
  *         schema:
- *           $ref: '#/definitions/ApiResponse'
- *
+ *           $ref: '#/definitions/ApiError'
+ *       403:
+ *         description: Access forbidden, resource cannot be accessed with these permissions
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       500:
+ *         description: general server error, apart from general information, stackt treace will be provided
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
+ *       501:
+ *         description: Sql Error, something went wrong during sql query
+ *         schema:
+ *           $ref: '#/definitions/ApiError'
  *
  */
 

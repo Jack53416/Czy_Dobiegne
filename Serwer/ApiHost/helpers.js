@@ -5,6 +5,47 @@ var path = require('path');
 var assert = require('assert');
 var validator = require('validator');
 
+class InvalidRequestError extends Error{
+  constructor(...args){
+    super(...args);
+    this.code = 400;
+    Error.captureStackTrace(this, UnauthorizedAccessError);
+  }
+}
+
+class UnauthorizedAccessError extends Error{
+  constructor(...args){
+    super(...args);
+    this.code = 401;
+    Error.captureStackTrace(this, UnauthorizedAccessError);
+  }
+}
+
+class ForbiddenAccessError extends Error{
+  constructor(...args){
+    super(...args);
+    this.code = 403;
+    Error.captureStackTrace(this, ForbiddenAccessError);
+  }
+}
+
+class SqlError extends Error{
+  constructor(...args){
+    super(...args);
+    this.code = 501;
+    Error.captureStackTrace(this, ForbiddenAccessError);
+  }
+}
+class ErrorResponse{
+  constructor(error, isStackTraced){
+    this.success = false;
+    this.errorType = error.constructor.name;
+    this.message = error.message;
+    if(isStackTraced)
+      this.stackTrace = error.stack.split('\n')
+    }
+}
+
 const readDirectorySync = (dir, usrFilter) =>
  fs.readdirSync(dir)
     .reduce((files, file) =>
@@ -82,3 +123,8 @@ exports.generateSalt = generateSalt;
 exports.escapeColumnNames = escapeColumnNames;
 exports.readDirectorySync = readDirectorySync;
 exports.validateStandardQuery = validateStandardQuery;
+exports.InvalidRequestError = InvalidRequestError;
+exports.UnauthorizedAccessError = UnauthorizedAccessError;
+exports.ForbiddenAccessError = ForbiddenAccessError;
+exports.SqlError = SqlError;
+exports.ErrorResponse = ErrorResponse;

@@ -47,6 +47,17 @@ var database = require('../database.js');
  *         type: boolean
  *       message:
  *         type: string
+ *   ApiError:
+ *     type: object
+ *     properties:
+ *       success:
+ *         type: boolean
+ *       message:
+ *         type: string
+ *       errorType:
+ *         type: string
+ *                  
+ *
  */
 
 /**
