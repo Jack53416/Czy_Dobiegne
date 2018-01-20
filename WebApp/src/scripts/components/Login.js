@@ -87,7 +87,7 @@ class Login extends BaseComponent {
     return (
       <div>
         <Row>
-          <Col xs={6}>
+          <Col md={6} xs={12}>
               <div className="Login">
               <form onSubmit={this.handleLoginSubmit.bind(this)}>
                 <h2>Login</h2>
@@ -117,7 +117,7 @@ class Login extends BaseComponent {
               </form>
             </div>
         </Col>
-        <Col xs={6}>
+        <Col md={6} xs={12}>
             <div className="Login">
             <form onSubmit={this.handleRegisterSubmit.bind(this)}>
               <h2>Register</h2>

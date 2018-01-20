@@ -1,12 +1,12 @@
 import React from 'react';
 import BaseComponent from '../base/BaseComponent';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import Map from './Map';
 import Filter from './Filter';
 
 
 class Dashboard extends BaseComponent {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = { locations: [] };
@@ -22,25 +22,48 @@ class Dashboard extends BaseComponent {
             });
     }
 
-    handleFilter(filterProps){
+    handleFilter(filterProps) {
         var querypath = `/locations/${filterProps.city}?fields=*&street=${filterProps.street}&price_min=${filterProps.priceMin}&price_max=${filterProps.priceMax}`;
         BaseComponent.Api.get(querypath)
-        .then(res => {
-            this.setState({
-                locations: res.data.data
+            .then(res => {
+                this.setState({
+                    locations: res.data.data
+                });
             });
-        });
-        
+
+    }
+
+    showFilters() {
+        var querypath = `/locations/${filterProps.city}?fields=*&street=${filterProps.street}&price_min=${filterProps.priceMin}&price_max=${filterProps.priceMax}`;
+        BaseComponent.Api.get(querypath)
+            .then(res => {
+                this.setState({
+                    locations: res.data.data
+                });
+            });
+
     }
 
     render() {
         return (
             <Row className="dashboard">
-                <Col xs={4}>
-                    <Filter filterCallback={this.handleFilterCallback} />
+                <Col md={4} xs={12}>
+                    <Button
+                        block
+                        data-toggle="collapse"
+                        className="showFilters"
+                        bsSize="large"
+                        data-target="#filters"
+                    >
+                        Filtry
+                        </Button>
+                    <div id="filters" className="collapse">
+                        <Filter filterCallback={this.handleFilterCallback} />
+                    </div>
+
                 </Col>
-                <Col xs={8}>
-                    <Map locations={this.state.locations}/>
+                <Col md={8} xs={12}>
+                    <Map locations={this.state.locations} />
                 </Col>
             </Row>
         );

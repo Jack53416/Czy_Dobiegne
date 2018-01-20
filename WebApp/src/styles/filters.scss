@@ -1,0 +1,20 @@
+.showFilters{
+    @media (min-width: $screen-md-min) {
+        display: none;
+      }
+}
+
+#filters {
+    @media (min-width: $screen-xs-min) {
+        display: none !important;
+      }
+
+    @media (min-width: $screen-md-min) {
+        display: block !important;
+      }
+}
+
+#filters.collapse.in
+{
+    display: block !important;
+}

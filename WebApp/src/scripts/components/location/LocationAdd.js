@@ -66,7 +66,7 @@ class LocationAdd extends BaseComponent {
             <Row>
                 <form onSubmit={this.handleSave.bind(this)}>
                     <h2>Dodaj lokalizacje</h2>
-                    <Col xs={6}>
+                    <Col md={6} xs={12}>
                         <FormGroup controlId="name" bsSize="large">
                             <ControlLabel>Name</ControlLabel>
                             <FormControl
@@ -108,7 +108,7 @@ class LocationAdd extends BaseComponent {
                             />
                         </FormGroup>
                     </Col>
-                    <Col xs={6}>
+                    <Col md={6} xs={12}>
                         <FormGroup controlId="longitude" bsSize="large">
                             <ControlLabel>Longitude</ControlLabel>
                             <FormControl

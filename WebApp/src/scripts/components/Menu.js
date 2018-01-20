@@ -36,8 +36,6 @@ class Menu extends BaseComponent {
 
                     <Navbar.Collapse>
                         <Navbar.Text className={styles.userMenu}>
-                            <Navbar.Link href="#"><Glyphicon glyph="home" /></Navbar.Link>
-
                         </Navbar.Text>
                         <Nav>
                             <NavDropdown id="dropdown1" eventKey={1} title="Lokalizacje">
