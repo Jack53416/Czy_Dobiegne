@@ -40,10 +40,8 @@ class Menu extends BaseComponent {
                         <Nav>
                             <NavDropdown id="dropdown1" eventKey={1} title="Lokalizacje">
                                 <   MenuItem eventKey={1.1} href="location">Lista</MenuItem>
-                                <MenuItem eventKey={1.1} href="locationadd">Dodaj nową</MenuItem>
+                                <MenuItem eventKey={1.1} href="locationadd"style={{ display: BaseComponent.isLoggedIn == 'true' ? 'inline' : 'none' }} >Dodaj nową</MenuItem>
                             </NavDropdown>
-                            <NavItem eventKey={2}>Item 2</NavItem>
-                            <NavItem eventKey={3}>Item 3</NavItem>
                         </Nav>
                         <Nav pullRight>
                             <NavItem href="/register" style={{ display: BaseComponent.isLoggedIn == 'true' ? 'none' : 'inline' }}><Glyphicon glyph="user" /> Zarejestruj się</NavItem>

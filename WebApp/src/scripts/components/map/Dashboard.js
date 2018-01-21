@@ -3,6 +3,9 @@ import BaseComponent from '../base/BaseComponent';
 import { Row, Col, Button } from 'react-bootstrap';
 import Map from './Map';
 import Filter from './Filter';
+import { Switch, Route } from 'react-router-dom'
+import LocationList from '../location/LocationList';
+
 
 
 class Dashboard extends BaseComponent {
@@ -23,18 +26,26 @@ class Dashboard extends BaseComponent {
     }
 
     handleFilter(filterProps) {
-        var querypath = `/locations/${filterProps.city}?fields=*&street=${filterProps.street}&price_min=${filterProps.priceMin}&price_max=${filterProps.priceMax}`;
+        var querypath = `/query/locations?latitude=>0&longitude=>0&city=${filterProps.city}&fields=*&street=${filterProps.street}&price_min=${filterProps.priceMin}&price_max=${filterProps.priceMax}`;
+        console.log(querypath);
         BaseComponent.Api.get(querypath)
             .then(res => {
+                if (res.data.data === undefined)
+                    res.data.data = []
                 this.setState({
                     locations: res.data.data
+                });
+            })
+            .catch(error => {
+                this.setState({
+                    locations: []
                 });
             });
 
     }
 
     showFilters() {
-        var querypath = `/locations/${filterProps.city}?fields=*&street=${filterProps.street}&price_min=${filterProps.priceMin}&price_max=${filterProps.priceMax}`;
+        var querypath = `/query/locations?fields=*&city=${filterProps.city}&street=${filterProps.street}&price_min=${filterProps.priceMin}&price_max=${filterProps.priceMax}`;
         BaseComponent.Api.get(querypath)
             .then(res => {
                 this.setState({
@@ -63,7 +74,19 @@ class Dashboard extends BaseComponent {
 
                 </Col>
                 <Col md={8} xs={12}>
-                    <Map locations={this.state.locations} />
+                    <Switch>
+                        <Route path="/location" render={() => <LocationList
+                            locations={this.state.locations}
+                        />
+                        } />
+                        <Route path="/" render={() => <Map
+                            locations={this.state.locations}
+                        />
+                        } />
+
+
+                    </Switch>
+                    {/* <Map locations={this.state.locations} /> */}
                 </Col>
             </Row>
         );

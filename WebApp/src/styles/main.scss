@@ -20,9 +20,15 @@ body{
 
 .dashboard{
     background-color: rgb(49, 113, 168);
+    height: 100%;
+    overflow: scroll;
 }
 
 .maincontent {
     min-height: 100%;
     height: 100%;
+}
+
+.locationListTableRow td {
+    color:white !important;
 }

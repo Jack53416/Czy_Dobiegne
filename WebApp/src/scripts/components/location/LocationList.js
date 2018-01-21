@@ -12,7 +12,7 @@ class LocationList extends BaseComponent {
             locations: []
         }
 
-        this.getLocations();
+        //this.getLocations();
     }
 
     getLocations() {
@@ -29,7 +29,7 @@ class LocationList extends BaseComponent {
 
     render() {
         return (
-            <BootstrapTable data={this.state.locations} striped={true} hover={true}>
+            <BootstrapTable data={this.props.locations} striped={false} hover={false} style="background:white;" trClassName="locationListTableRow">
                 <TableHeaderColumn dataField="id" isKey={true} hidden={true} dataAlign="center" dataSort={true}>Product ID</TableHeaderColumn>
                 <TableHeaderColumn dataField="name" dataSort={true}>Nazwa</TableHeaderColumn>
                 <TableHeaderColumn dataField="city" >Miasto</TableHeaderColumn>

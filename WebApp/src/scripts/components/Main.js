@@ -7,6 +7,7 @@ import LocationList from './location/LocationList';
 import LocationAdd from './location/LocationAdd';
 
 
+
 class Main extends React.Component {
     render() {
         return (
@@ -16,7 +17,7 @@ class Main extends React.Component {
                     <Route path='/login' component={Login} />
                     <Route path='/register' component={Login} />
                     <Route path='/user' component={UserDetails} />
-                    <Route path='/location' component={LocationList}/>
+                    <Route path='/location' component={AppMap}/>
                     <Route exact path='/locationAdd' component={LocationAdd} />
                 </Switch>
             </main>

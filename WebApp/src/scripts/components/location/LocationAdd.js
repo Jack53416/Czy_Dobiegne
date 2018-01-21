@@ -4,6 +4,7 @@ import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import { Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
+
 class LocationAdd extends BaseComponent {
 
     constructor(props) {
